@@ -33,7 +33,14 @@ const quiz = await createQuiz({
 });
 
 export function QuizDemo() {
-  return <Quiz questions={quiz} />;
+  return (
+    <Quiz
+      questions={quiz}
+      onComplete={(result) => {
+        console.log(result.score, result.total);
+      }}
+    />
+  );
 }
 ```
 
@@ -41,7 +48,7 @@ export function QuizDemo() {
 
 | Component | Props | Source |
 | --- | --- | --- |
-| `Quiz` | `questions` | `createQuiz` |
+| `Quiz` | `questions`, `onComplete?` | `createQuiz` / `gradeQuiz` |
 | `Flashcards` | `flashcards` | `createFlashcards` |
 | `StudyGuide` | `studyGuide` | `createStudyGuide` |
 | `PracticeProblems` | `problems` | `createPracticeProblems` |
