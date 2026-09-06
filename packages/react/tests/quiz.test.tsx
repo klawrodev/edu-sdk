@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { Quiz } from '../src/quiz/quiz';
 import userEvent from "@testing-library/user-event";
 
@@ -164,6 +164,95 @@ describe('Quiz', () => {
             name: 'Submit'
         }));
 
+        expect(screen.getByText('Score: 1 / 2')).toBeInTheDocument();
+    });
+
+    test('calls onComplete with the grade result when the quiz is finished', async () => {
+        const user = userEvent.setup();
+        const onComplete = vi.fn();
+        render(<Quiz questions={questions} onComplete={onComplete} />);
+
+        await user.click(screen.getByRole('button', {
+            name: 'Electrical potential difference'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Submit'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Next'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Ampere'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Submit'
+        }));
+
+        expect(onComplete).toHaveBeenCalledTimes(1);
+        expect(onComplete).toHaveBeenCalledWith({
+            score: 2,
+            total: 2,
+            percentage: 100,
+            results: [
+                {
+                    questionIndex: 0,
+                    selectedAnswer: 0,
+                    correctAnswer: 0,
+                    isCorrect: true,
+                    isAnswered: true,
+                },
+                {
+                    questionIndex: 1,
+                    selectedAnswer: 1,
+                    correctAnswer: 1,
+                    isCorrect: true,
+                    isAnswered: true,
+                },
+            ],
+        });
+    });
+
+    test('does not call onComplete before the quiz is complete', async () => {
+        const user = userEvent.setup();
+        const onComplete = vi.fn();
+        render(<Quiz questions={questions} onComplete={onComplete} />);
+
+        await user.click(screen.getByRole('button', {
+            name: 'Electrical potential difference'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Submit'
+        }));
+
+        expect(onComplete).not.toHaveBeenCalled();
+    });
+
+    test('does not call onComplete again after navigating Previous', async () => {
+        const user = userEvent.setup();
+        const onComplete = vi.fn();
+        render(<Quiz questions={questions} onComplete={onComplete} />);
+
+        await user.click(screen.getByRole('button', {
+            name: 'Electrical potential difference'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Submit'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Next'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Volt'
+        }));
+        await user.click(screen.getByRole('button', {
+            name: 'Submit'
+        }));
+
+        expect(onComplete).toHaveBeenCalledTimes(1);
+
+        await user.click(screen.getByRole('button', { name: 'Previous' }));
+
+        expect(onComplete).toHaveBeenCalledTimes(1);
         expect(screen.getByText('Score: 1 / 2')).toBeInTheDocument();
     });
 
