@@ -1,7 +1,7 @@
 'use client'
 
-import type { QuizQuestion } from "edu-sdk";
-import { useState } from "react";
+import { gradeQuiz, type GradeQuizResult, type QuizQuestion } from "edu-sdk";
+import { useRef, useState } from "react";
 import { cn } from "../utils/index.js";
 
 export type QuizClassNames = {
@@ -24,13 +24,16 @@ export type QuizClassNames = {
 export type QuizProps = {
     questions: QuizQuestion[];
     className?: string;
-    classNames?: QuizClassNames
+    classNames?: QuizClassNames;
+    onComplete?: (result: GradeQuizResult) => void;
 }
 
-export function Quiz({ questions, className, classNames }: QuizProps) {
+export function Quiz({ questions, className, classNames, onComplete }: QuizProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedOptions, setSelectedOptions] = useState<(number | null)[]>(() => questions.map(() => null));
     const [submittedQuestions, setSubmittedQuestions] = useState<boolean[]>(() => questions.map(() => false));
+    const [result, setResult] = useState<GradeQuizResult | null>(null);
+    const hasCompleted = useRef(false);
 
     if (questions.length === 0) return null;
 
@@ -62,21 +65,21 @@ export function Quiz({ questions, className, classNames }: QuizProps) {
 
     function submitQuestion() {
         if (selectedOption === null) return;
-        setSubmittedQuestions(prev => {
-            const updated = [...prev]
-            updated[currentIndex] = true;
-            return updated
-        });
-    }
 
-    const score = questions.reduce((total, question, idx) => {
-        if (submittedQuestions[idx] && selectedOptions[idx] === question.correctAnswer) {
-            return total + 1
+        const updatedSubmitted = [...submittedQuestions];
+        updatedSubmitted[currentIndex] = true;
+        setSubmittedQuestions(updatedSubmitted);
+
+        if (updatedSubmitted.every(Boolean) && !hasCompleted.current) {
+            hasCompleted.current = true;
+            const result = gradeQuiz({
+                questions,
+                answers: selectedOptions,
+            });
+            setResult(result);
+            onComplete?.(result);
         }
-        return total
-    }, 0);
-
-    const completed = submittedQuestions.every(Boolean);
+    }
 
     return (
         <div className={cn("edu-quiz", className, classNames?.root)}>
@@ -139,9 +142,9 @@ export function Quiz({ questions, className, classNames }: QuizProps) {
                 ) : null}
             </div>
 
-            {completed && (
+            {result && (
                 <div className={cn("edu-quiz__result", classNames?.result)}>
-                    Score: {score} / {questions.length}
+                    Score: {result.score} / {result.total}
                 </div>
             )}
         </div>
