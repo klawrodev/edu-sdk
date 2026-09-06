@@ -1,0 +1,68 @@
+---
+title: gradeQuiz
+description: Grade a multiple-choice quiz by comparing submitted answers to correct options.
+---
+
+Grades a multiple-choice quiz by comparing submitted option indices to each question's `correctAnswer`. No model call — scoring is deterministic.
+
+## Usage
+
+```ts
+import { createQuiz, gradeQuiz } from "edu-sdk";
+
+const questions = await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content,
+  count: 10
+});
+
+const result = gradeQuiz({
+  questions,
+  answers: [0, 2, null, 1]
+});
+```
+
+## Options
+
+| Option | Type | Required | Default |
+| --- | --- | --- | --- |
+| `questions` | `QuizQuestion[]` | Yes | — |
+| `answers` | `(number \| null)[]` | Yes | — |
+
+`answers` must be the same length as `questions`. Each entry is a zero-indexed option, or `null` for unanswered.
+
+## Returns
+
+`GradeQuizResult`
+
+```ts
+{
+  score: number;
+  total: number;
+  percentage: number;
+  results: Array<{
+    questionIndex: number;
+    selectedAnswer: number | null;
+    correctAnswer: number;
+    isCorrect: boolean;
+    isAnswered: boolean;
+  }>;
+}
+```
+
+`percentage` is `0`–`100`, rounded to the nearest integer. Unanswered questions count as incorrect (`isCorrect: false`, `isAnswered: false`).
+
+## Example
+
+```ts
+import { gradeQuiz } from "edu-sdk";
+
+const result = gradeQuiz({
+  questions,
+  answers: [0, 1, 2]
+});
+
+console.log(`${result.score} / ${result.total} (${result.percentage}%)`);
+```
+
+Invalid input throws `InvalidInputError`.
