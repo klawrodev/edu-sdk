@@ -38,6 +38,7 @@ const quiz = await createQuiz({
 | Function | Description |
 | --- | --- |
 | `createQuiz` | Multiple-choice questions |
+| `gradeQuiz` | Score submitted quiz answers |
 | `createFlashcards` | Front/back flashcards |
 | `createStudyGuide` | Structured study guide |
 | `createPracticeProblems` | Practice problems with solutions |
