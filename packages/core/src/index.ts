@@ -7,6 +7,9 @@ export type { Note, CreateNoteOptions } from './notes/create-note.js';
 export { createQuiz } from './quizzes/create-quiz.js';
 export type { QuizQuestion, CreateQuizOptions } from './quizzes/create-quiz.js';
 
+export { gradeQuiz } from './quizzes/gradeQuiz.js';
+export type { GradeQuizOptions, GradeQuizResult } from './quizzes/gradeQuiz.js';
+
 export { createStudyGuide } from './studyguide/create-studyguide.js';
 export type { StudyGuide, CreateStudyGuideOptions } from './studyguide/create-studyguide.js';
 
