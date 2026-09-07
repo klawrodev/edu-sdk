@@ -5,12 +5,14 @@ import userEvent from "@testing-library/user-event";
 
 const problems = [
     {
+        id: 'p-1',
         question: 'A 12 V battery is connected to a 4 Ω resistor. What current flows through it?',
         hint: 'Think about the relationship between voltage, current, and resistance.',
         answer: '3 A',
         solution: "Using Ohm's law, I = V / R. Therefore, I = 12 / 4 = 3 A."
     },
     {
+        id: 'p-2',
         question: 'A resistor has 6 V across it and carries 2 A. What is its resistance?',
         hint: "Use Ohm's law to relate voltage, current, and resistance.",
         answer: '3 Ω',
@@ -137,5 +139,24 @@ describe('PracticeProblems', () => {
         const { container } = render(<PracticeProblems problems={problems} className="custom-practice-problems" />);
 
         expect(container.firstChild).toHaveClass("edu-practice-problems", "custom-practice-problems");
+    });
+
+    test("applies custom problem and question slot classes", () => {
+        render(
+            <PracticeProblems
+                problems={problems}
+                classNames={{
+                    problem: "custom-problem",
+                    question: "custom-question",
+                }}
+            />
+        );
+
+        const question = screen.getByText(
+            "A 12 V battery is connected to a 4 Ω resistor. What current flows through it?"
+        );
+
+        expect(question).toHaveClass("edu-practice-problems__question", "custom-question");
+        expect(question.parentElement).toHaveClass("edu-practice-problems__problem", "custom-problem");
     });
 })

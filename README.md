@@ -43,7 +43,7 @@ const quiz = await createQuiz({
   difficulty: "medium",
 });
 
-<Quiz questions={quiz} />;
+<Quiz questions={quiz.content} />;
 ```
 
 ## Monorepo

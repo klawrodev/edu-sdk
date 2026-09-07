@@ -12,7 +12,7 @@ export function baseOptions(): BaseLayoutProps {
         </>
       ),
     },
-    githubUrl: 'https://github.com/Tobi3333A/edu-sdk',
+    githubUrl: 'https://github.com/klawrodev/edu-sdk',
     links: [
       {
         text: 'Docs',

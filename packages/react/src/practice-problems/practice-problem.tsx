@@ -69,7 +69,9 @@ export function PracticeProblems({ problems, className, classNames }: PracticePr
             </div>
 
             <div className={cn("edu-practice-problems__problem", classNames?.problem)}>
-                {currentProblem.question}
+                <div className={cn("edu-practice-problems__question", classNames?.question)}>
+                    {currentProblem.question}
+                </div>
             </div>
 
             <div className={cn("edu-practice-problems__actions", classNames?.actions)}>
