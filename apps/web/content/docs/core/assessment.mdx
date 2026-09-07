@@ -1,0 +1,80 @@
+---
+title: Assessment
+description: Record and complete quiz attempts with createQuizAttempt and completeQuizAttempt.
+---
+
+Assessment helpers wrap [`gradeQuiz()`](/docs/core/grade-quiz) with attempt lifecycle metadata (`id`, `startedAt`, `completedAt`).
+
+## createQuizAttempt
+
+Starts a quiz attempt.
+
+```ts
+import { createQuizAttempt } from "edu-sdk";
+
+const attempt = createQuizAttempt();
+```
+
+### Options
+
+All options are optional.
+
+| Option | Type | Default |
+| --- | --- | --- |
+| `id` | `string` | `crypto.randomUUID()` |
+| `answers` | `(number \| null)[]` | `[]` |
+| `startedAt` | `string` | `new Date().toISOString()` |
+
+### Returns
+
+`QuizAttempt`
+
+```ts
+{
+  id: string;
+  answers: (number | null)[];
+  startedAt: string;
+  completedAt?: string;
+}
+```
+
+## completeQuizAttempt
+
+Finishes an attempt: grades answers with `gradeQuiz` and sets `completedAt`.
+
+```ts
+import { createQuiz, createQuizAttempt, completeQuizAttempt } from "edu-sdk";
+
+const questions = await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content,
+  count: 10
+});
+
+const attempt = createQuizAttempt();
+
+const { attempt: completed, result } = completeQuizAttempt({
+  attempt,
+  questions,
+  answers: [0, 2, null, 1]
+});
+```
+
+### Options
+
+| Option | Type | Required |
+| --- | --- | --- |
+| `attempt` | `QuizAttempt` | Yes |
+| `questions` | `QuizQuestion[]` | Yes |
+| `answers` | `(number \| null)[]` | Yes |
+
+### Returns
+
+```ts
+{
+  attempt: QuizAttempt;      // includes answers and completedAt
+  result: AssessmentResult;  // same shape as GradeQuizResult
+}
+```
+
+Invalid input throws `InvalidInputError`.

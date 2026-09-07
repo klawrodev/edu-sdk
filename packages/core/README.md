@@ -39,6 +39,8 @@ const quiz = await createQuiz({
 | --- | --- |
 | `createQuiz` | Multiple-choice questions |
 | `gradeQuiz` | Score submitted quiz answers |
+| `createQuizAttempt` | Start a quiz attempt record |
+| `completeQuizAttempt` | Finish an attempt and grade it |
 | `createFlashcards` | Front/back flashcards |
 | `createStudyGuide` | Structured study guide |
 | `createPracticeProblems` | Practice problems with solutions |

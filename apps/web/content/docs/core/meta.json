@@ -6,6 +6,7 @@
     "create-note",
     "create-quiz",
     "grade-quiz",
+    "assessment",
     "create-study-guide",
     "create-practice-problems"
   ],
