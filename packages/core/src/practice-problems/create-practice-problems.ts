@@ -1,6 +1,8 @@
 import { generateText, Output } from 'ai';
 import { z } from 'zod';
 import { generationOptionsSchema } from "../shared/schema.js";
+import { artifactLabelSchema, stampLeafIds, wrapArtifact } from '../shared/artifact.js';
+import type { Artifact } from '../shared/artifact.js';
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from '../shared/prompts.js';
 import { InvalidInputError } from '../errors/errors.js';
 
@@ -15,8 +17,10 @@ const practiceProblemSchema = z.object({
     answer: z.string().min(1).describe('A concise final answer'),
     solution: z.string().min(1).describe('A clear worked solution explaining how to reach the answer step by step')
 });
-export type PracticeProblem = z.infer<typeof practiceProblemSchema>;
-export type PracticeProblems = PracticeProblem[];
+
+type PracticeProblemFields = z.infer<typeof practiceProblemSchema>;
+export type PracticeProblem = PracticeProblemFields & { id: string };
+export type PracticeProblems = Artifact<PracticeProblem[]>;
 
 export async function createPracticeProblems(options: CreatePracticeProblemsOptions): Promise<PracticeProblems> {
     const result = createPracticeProblemsOptionsSchema.safeParse(options);
@@ -40,7 +44,8 @@ export async function createPracticeProblems(options: CreatePracticeProblemsOpti
                 'Include a clear worked solution explaining how to reach the answer step by step.',
                 'Match the requested difficulty level.',
                 'Avoid duplicate or nearly identical problems.',
-                'Stay grounded in the provided content and do not introduce unsupported facts.'
+                'Stay grounded in the provided content and do not introduce unsupported facts.',
+                'Provide a concise title and optional short description for the practice problem set as a whole.'
             ],
             difficulty,
             extras: [
@@ -56,11 +61,17 @@ export async function createPracticeProblems(options: CreatePracticeProblemsOpti
             content
         }),
         output: Output.object({
-            schema: z.object({
+            schema: artifactLabelSchema.extend({
                 problems: z.array(practiceProblemSchema).length(count)
             })
         })
     });
 
-    return output.problems
+    return wrapArtifact({
+        title: output.title,
+        description: output.description,
+        content: stampLeafIds(output.problems),
+        model,
+        difficulty,
+    });
 };

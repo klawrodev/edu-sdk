@@ -11,7 +11,7 @@ Renders a flip-through deck of flashcards from [`createFlashcards()`](/docs/core
 import { Flashcards } from "@edu-sdk/react";
 import "@edu-sdk/react/styles.css";
 
-<Flashcards flashcards={flashcards} />
+<Flashcards flashcards={flashcards.content} />
 ```
 
 ## Props
@@ -39,7 +39,7 @@ type FlashcardsProps = {
 
 ```tsx
 <Flashcards
-  flashcards={flashcards}
+  flashcards={flashcards.content}
   className="my-flashcards"
   classNames={{
     card: "my-card",

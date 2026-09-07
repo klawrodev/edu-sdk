@@ -4,6 +4,22 @@ Generate learning materials from content using a language model.
 
 Pass a `model` (string model ID or AI SDK `LanguageModel`), `content`, and optional `difficulty` (`easy` | `medium` | `hard`).
 
+Every generator returns an `Artifact<T>`:
+
+```ts
+{
+  id: string;
+  title: string;
+  description?: string;
+  metadata: {
+    createdAt: string;
+    model: string;
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: T;
+}
+```
+
 ## Install
 
 ```bash
@@ -21,12 +37,15 @@ const quiz = await createQuiz({
   count: 10,
   difficulty: "medium",
 });
+
+console.log(quiz.title, quiz.content);
 ```
 
-`createQuiz` returns `Promise<QuizQuestion[]>`. Each question looks like:
+`createQuiz` returns `Promise<Artifact<QuizQuestion[]>>`. Each question in `content` looks like:
 
 ```ts
 {
+  id: string;
   question: string;
   options: string[];
   correctAnswer: number; // zero-indexed
@@ -67,7 +86,7 @@ import { InvalidInputError, EduSDKError } from "edu-sdk";
 
 ## UI
 
-For React components that render these outputs, use [`@edu-sdk/react`](../react/README.md).
+For React components that render these outputs, use [`@edu-sdk/react`](../react/README.md). Pass `artifact.content` into list-based components (`Quiz`, `Flashcards`, `PracticeProblems`); pass the full artifact into `StudyGuide`.
 
 ## Links
 

@@ -3,6 +3,7 @@ import { InvalidInputError } from "../errors/errors.js";
 
 const quizQuestionSchema = z
     .object({
+        id: z.string().min(1).optional(),
         question: z.string().min(1),
         options: z.array(z.string()).min(2),
         correctAnswer: z.number().int().min(0),

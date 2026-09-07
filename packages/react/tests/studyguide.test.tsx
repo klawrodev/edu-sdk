@@ -3,22 +3,30 @@ import { render, screen } from "@testing-library/react";
 import { StudyGuide } from "../src/studyguide/studyguide";
 
 const studyGuide = {
+    id: "guide-1",
     title: "Electricity",
-    summary: "Electricity involves the behavior and movement of electric charge.",
-    keyConcepts: [
-        {
-            concept: "Voltage",
-            explanation: "Voltage is the electric potential difference between two points."
-        },
-        {
-            concept: "Current",
-            explanation: "Current is the rate of flow of electric charge."
-        }
-    ],
-    reviewQuestions: [
-        "What is voltage?",
-        "How is current measured?"
-    ]
+    metadata: {
+        createdAt: "2026-01-01T00:00:00.000Z",
+        model: "google/gemini-3.6-flash",
+        difficulty: "medium" as const,
+    },
+    content: {
+        summary: "Electricity involves the behavior and movement of electric charge.",
+        keyConcepts: [
+            {
+                concept: "Voltage",
+                explanation: "Voltage is the electric potential difference between two points."
+            },
+            {
+                concept: "Current",
+                explanation: "Current is the rate of flow of electric charge."
+            }
+        ],
+        reviewQuestions: [
+            "What is voltage?",
+            "How is current measured?"
+        ]
+    }
 };
 
 describe("StudyGuide", () => {

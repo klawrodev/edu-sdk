@@ -45,7 +45,7 @@ Finishes an attempt: grades answers with `gradeQuiz` and sets `completedAt`.
 ```ts
 import { createQuiz, createQuizAttempt, completeQuizAttempt } from "edu-sdk";
 
-const questions = await createQuiz({
+const quiz = await createQuiz({
   model: "google/gemini-3.6-flash",
   content,
   count: 10
@@ -55,7 +55,7 @@ const attempt = createQuizAttempt();
 
 const { attempt: completed, result } = completeQuizAttempt({
   attempt,
-  questions,
+  questions: quiz.content,
   answers: [0, 2, null, 1]
 });
 ```

@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { generationOptionsSchema } from "../shared/schema.js";
+import { wrapArtifact } from "../shared/artifact.js";
+import type { Artifact } from "../shared/artifact.js";
 import { InvalidInputError } from "../errors/errors.js";
 import { createQuiz } from "../quizzes/create-quiz.js";
-import type { QuizQuestion } from "../quizzes/create-quiz.js";
+import type { Quiz } from "../quizzes/create-quiz.js";
 import { createFlashcards } from "../flashcard/create-flashcards.js";
-import type { Flashcard } from "../flashcard/create-flashcards.js";
+import type { Flashcards } from "../flashcard/create-flashcards.js";
 import { createNote } from "../notes/create-note.js";
 import type { Note } from "../notes/create-note.js";
 
@@ -25,11 +27,13 @@ export const createLearningSetOptionsSchema = generationOptionsSchema.extend({
 
 export type CreateLearningSetOptions = z.infer<typeof createLearningSetOptionsSchema>;
 
-export type LearningSet = {
-    quiz: QuizQuestion[];
-    flashcards: Flashcard[];
+export type LearningSetContent = {
+    quiz: Quiz;
+    flashcards: Flashcards;
     notes: Note;
 };
+
+export type LearningSet = Artifact<LearningSetContent>;
 
 export async function createLearningSet(options: CreateLearningSetOptions): Promise<LearningSet> {
     const parsed = createLearningSetOptionsSchema.safeParse(options);
@@ -63,9 +67,15 @@ export async function createLearningSet(options: CreateLearningSetOptions): Prom
         }),
     ]);
 
-    return {
-        quiz: quizResult,
-        flashcards: flashcardsResult,
-        notes: notesResult,
-    };
+    return wrapArtifact({
+        title: notesResult.title,
+        description: notesResult.description ?? quizResult.description ?? flashcardsResult.description,
+        content: {
+            quiz: quizResult,
+            flashcards: flashcardsResult,
+            notes: notesResult,
+        },
+        model,
+        difficulty,
+    });
 }

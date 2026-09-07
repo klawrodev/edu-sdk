@@ -1,6 +1,8 @@
 import { generateText, Output } from 'ai';
 import { z } from 'zod';
 import { generationOptionsSchema } from "../shared/schema.js";
+import { artifactLabelSchema, wrapArtifact } from '../shared/artifact.js';
+import type { Artifact } from '../shared/artifact.js';
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from '../shared/prompts.js';
 import { InvalidInputError } from '../errors/errors.js';
 
@@ -8,8 +10,7 @@ import { InvalidInputError } from '../errors/errors.js';
 export const createStudyGuideOptionsSchema = generationOptionsSchema;
 export type CreateStudyGuideOptions = z.infer<typeof createStudyGuideOptionsSchema>;
 
-const studyGuideSchema = z.object({
-    title: z.string().min(1).describe('A concise title for the study guide'),
+const studyGuideOutputSchema = artifactLabelSchema.extend({
     summary: z.string().min(1).describe('A concise but complete summary of the material'),
     keyConcepts: z.array(
         z.object({
@@ -19,7 +20,17 @@ const studyGuideSchema = z.object({
     ).min(1).describe('The most important concepts a student should understand'),
     reviewQuestions: z.array(z.string().min(1)).min(1).describe('Review questions that test understanding rather than simple memorization')
 });
-export type StudyGuide = z.infer<typeof studyGuideSchema>;
+
+export type StudyGuideContent = {
+    summary: string;
+    keyConcepts: {
+        concept: string;
+        explanation: string;
+    }[];
+    reviewQuestions: string[];
+};
+
+export type StudyGuide = Artifact<StudyGuideContent>;
 
 export async function createStudyGuide(options: CreateStudyGuideOptions): Promise<StudyGuide> {
     const result = createStudyGuideOptionsSchema.safeParse(options);
@@ -40,15 +51,26 @@ export async function createStudyGuide(options: CreateStudyGuideOptions): Promis
                 'Explain each key concept clearly and accurately.',
                 'Include review questions that test understanding rather than simple memorization.',
                 'Stay grounded in the provided content and do not introduce unsupported information.',
-                'Match the requested difficulty level.'
+                'Match the requested difficulty level.',
+                'Provide a concise title and optional short description for the study guide as a whole.'
             ],
             difficulty,
             content
         }),
         output: Output.object({
-            schema: studyGuideSchema
+            schema: studyGuideOutputSchema
         })
     });
 
-    return output;
+    return wrapArtifact({
+        title: output.title,
+        description: output.description,
+        content: {
+            summary: output.summary,
+            keyConcepts: output.keyConcepts,
+            reviewQuestions: output.reviewQuestions,
+        },
+        model,
+        difficulty,
+    });
 };

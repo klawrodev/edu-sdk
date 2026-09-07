@@ -48,19 +48,31 @@ describe('createPracticeProblems', () => {
         mockedGenerateText.mockReset();
         mockedGenerateText.mockResolvedValue({
             output: {
+                title: "Ohm's Law Practice",
+                description: 'Circuit calculation drills',
                 problems: practiceProblems
             }
         } as any);
     });
 
-    test('returns generated practice problems', async () => {
+    test('returns an artifact with stamped problem ids', async () => {
         const result = await createPracticeProblems({
             model: 'openai/gpt-5',
             content: 'Electricity',
             count: 1
         });
 
-        expect(result).toEqual(practiceProblems);
+        expect(result.title).toBe("Ohm's Law Practice");
+        expect(result.description).toBe('Circuit calculation drills');
+        expect(result.metadata).toEqual({
+            createdAt: expect.any(String),
+            model: 'openai/gpt-5',
+            difficulty: 'medium',
+        });
+        expect(result.id).toEqual(expect.any(String));
+        expect(result.content).toEqual([
+            { ...practiceProblems[0], id: expect.any(String) },
+        ]);
     });
 
     test('does not call generateText for invalid input', async () => {

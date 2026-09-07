@@ -29,12 +29,27 @@ const flashcards = await createFlashcards({
 
 ## Returns
 
-`Promise<Flashcard[]>`
-
-Each flashcard contains:
+`Promise<Artifact<Flashcard[]>>`
 
 ```ts
 {
+  id: string;
+  title: string;
+  description?: string;
+  metadata: {
+    createdAt: string;
+    model: string;
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: Flashcard[];
+}
+```
+
+Each flashcard in `content` contains:
+
+```ts
+{
+  id: string;
   front: string;
   back: string;
 }
@@ -51,6 +66,8 @@ const flashcards = await createFlashcards({
   count: 8,
   difficulty: "easy"
 });
+
+// <Flashcards flashcards={flashcards.content} />
 ```
 
 Render with [`<Flashcards />`](/docs/react/flashcards).

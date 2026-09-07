@@ -18,10 +18,11 @@ const quiz = await createQuiz({
 });
 ```
 
-`createQuiz` returns `Promise<QuizQuestion[]>`. Each question looks like:
+`createQuiz` returns `Promise<Artifact<QuizQuestion[]>>`. Each question in `quiz.content` looks like:
 
 ```ts
 {
+  id: string;
   question: string;
   options: string[];
   correctAnswer: number; // zero-indexed
@@ -34,7 +35,7 @@ const quiz = await createQuiz({
 import { Quiz } from "@edu-sdk/react";
 import "@edu-sdk/react/styles.css";
 
-<Quiz questions={quiz} />
+<Quiz questions={quiz.content} />
 ```
 
 Import `styles.css` once in your app, not on every page.

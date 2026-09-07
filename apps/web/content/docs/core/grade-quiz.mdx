@@ -10,14 +10,14 @@ Grades a multiple-choice quiz by comparing submitted option indices to each ques
 ```ts
 import { createQuiz, gradeQuiz } from "edu-sdk";
 
-const questions = await createQuiz({
+const quiz = await createQuiz({
   model: "google/gemini-3.6-flash",
   content,
   count: 10
 });
 
 const result = gradeQuiz({
-  questions,
+  questions: quiz.content,
   answers: [0, 2, null, 1]
 });
 ```

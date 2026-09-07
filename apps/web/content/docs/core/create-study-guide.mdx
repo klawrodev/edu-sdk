@@ -27,17 +27,26 @@ const studyGuide = await createStudyGuide({
 
 ## Returns
 
-`Promise<StudyGuide>`
+`Promise<Artifact<StudyGuideContent>>`
 
 ```ts
 {
+  id: string;
   title: string;
-  summary: string;
-  keyConcepts: {
-    concept: string;
-    explanation: string;
-  }[];
-  reviewQuestions: string[];
+  description?: string;
+  metadata: {
+    createdAt: string;
+    model: string;
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: {
+    summary: string;
+    keyConcepts: {
+      concept: string;
+      explanation: string;
+    }[];
+    reviewQuestions: string[];
+  };
 }
 ```
 
@@ -51,6 +60,8 @@ const studyGuide = await createStudyGuide({
   content: chapterText,
   difficulty: "easy"
 });
+
+// <StudyGuide studyGuide={studyGuide} />
 ```
 
 Render with [`<StudyGuide />`](/docs/react/study-guide).

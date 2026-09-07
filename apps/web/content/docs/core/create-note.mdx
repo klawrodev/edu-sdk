@@ -29,9 +29,23 @@ const note = await createNote({
 
 ## Returns
 
-`Promise<string>`
+`Promise<Artifact<string>>`
 
-The string is Markdown: headings for sections, bold for important terms.
+```ts
+{
+  id: string;
+  title: string;
+  description?: string;
+  metadata: {
+    createdAt: string;
+    model: string;
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: string; // Markdown body
+}
+```
+
+`content` is Markdown: headings for sections, bold for important terms. `title` and optional `description` live on the envelope.
 
 ## Example
 
@@ -44,4 +58,6 @@ const note = await createNote({
   difficulty: "hard",
   length: "long"
 });
+
+console.log(note.title, note.content);
 ```

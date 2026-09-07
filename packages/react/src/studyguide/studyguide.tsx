@@ -1,4 +1,4 @@
-import type { StudyGuide as StudyGuideData } from "edu-sdk";
+import type { Artifact, StudyGuideContent } from "edu-sdk";
 import { cn } from "../utils/index.js";
 
 export type StudyGuideClassNames = {
@@ -15,6 +15,8 @@ export type StudyGuideClassNames = {
     reviewQuestion?: string;
 };
 
+type StudyGuideData = Artifact<StudyGuideContent>;
+
 export type StudyGuideProps = {
     studyGuide: StudyGuideData;
     className?: string;
@@ -22,6 +24,8 @@ export type StudyGuideProps = {
 };
 
 export function StudyGuide({ studyGuide, className, classNames }: StudyGuideProps) {
+    const { summary, keyConcepts, reviewQuestions } = studyGuide.content;
+
     return (
         <article className={cn("edu-study-guide", className, classNames?.root)}>
             <h2 className={cn("edu-study-guide__title", classNames?.title)}>
@@ -34,7 +38,7 @@ export function StudyGuide({ studyGuide, className, classNames }: StudyGuideProp
                 </h3>
 
                 <p className={cn("edu-study-guide__summary", classNames?.summary)}>
-                    {studyGuide.summary}
+                    {summary}
                 </p>
             </section>
 
@@ -44,7 +48,7 @@ export function StudyGuide({ studyGuide, className, classNames }: StudyGuideProp
                 </h3>
 
                 <div className={cn("edu-study-guide__key-concepts", classNames?.keyConcepts)}>
-                    {studyGuide.keyConcepts.map((item, index) => (
+                    {keyConcepts.map((item, index) => (
                         <div key={index} className={cn("edu-study-guide__key-concept", classNames?.keyConcept)}>
                             <h4 className={cn("edu-study-guide__concept-name", classNames?.conceptName)}>
                                 {item.concept}
@@ -64,7 +68,7 @@ export function StudyGuide({ studyGuide, className, classNames }: StudyGuideProp
                 </h3>
 
                 <ol className={cn("edu-study-guide__review-questions", classNames?.reviewQuestions)}>
-                    {studyGuide.reviewQuestions.map((question, index) => (
+                    {reviewQuestions.map((question, index) => (
                         <li key={index} className={cn("edu-study-guide__review-question", classNames?.reviewQuestion)}>
                             {question}
                         </li>

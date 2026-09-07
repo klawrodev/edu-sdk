@@ -29,6 +29,7 @@ describe('createStudyGuideOptionsSchema', () => {
 describe('createStudyGuide', () => {
     const studyguide = {
         title: 'Electricity',
+        description: 'A short guide to electricity',
         summary: 'Electricity is light.',
         keyConcepts: [
             {
@@ -46,13 +47,25 @@ describe('createStudyGuide', () => {
         } as any);
     });
 
-    test('returns generated study guide', async () => {
+    test('returns an artifact with study guide content', async () => {
         const result = await createStudyGuide({
             model: 'google/gemini-3.6-flash',
             content: 'Electricity'
         });
 
-        expect(result).toEqual(studyguide);
+        expect(result.title).toBe('Electricity');
+        expect(result.description).toBe('A short guide to electricity');
+        expect(result.content).toEqual({
+            summary: studyguide.summary,
+            keyConcepts: studyguide.keyConcepts,
+            reviewQuestions: studyguide.reviewQuestions,
+        });
+        expect(result.metadata).toEqual({
+            createdAt: expect.any(String),
+            model: 'google/gemini-3.6-flash',
+            difficulty: 'medium',
+        });
+        expect(result.id).toEqual(expect.any(String));
     });
 
     test('does not call generateText for invalid input', async () => {

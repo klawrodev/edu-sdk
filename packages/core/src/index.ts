@@ -14,14 +14,16 @@ export { createQuizAttempt, completeQuizAttempt } from './assessment/attempt.js'
 export type { QuizAttempt, AssessmentResult, CreateQuizAttemptOptions, CompleteQuizAttemptOptions } from './assessment/attempt.js';
 
 export { createLearningSet } from './learning-set/create-learning-set.js';
-export type { LearningSet, CreateLearningSetOptions } from './learning-set/create-learning-set.js';
+export type { LearningSetContent, CreateLearningSetOptions } from './learning-set/create-learning-set.js';
 
 export { createStudyGuide } from './studyguide/create-studyguide.js';
-export type { StudyGuide, CreateStudyGuideOptions } from './studyguide/create-studyguide.js';
+export type { StudyGuideContent, CreateStudyGuideOptions } from './studyguide/create-studyguide.js';
 
 export { createPracticeProblems } from './practice-problems/create-practice-problems.js';
 export type { PracticeProblem, CreatePracticeProblemsOptions } from './practice-problems/create-practice-problems.js';
 
 export type { Difficulty } from './shared/schema.js';
+
+export type { Artifact, ArtifactMetadata } from './shared/artifact.js';
 
 export { EduSDKError, InvalidInputError } from './errors/errors.js';

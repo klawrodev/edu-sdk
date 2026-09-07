@@ -11,7 +11,7 @@ Renders practice problems from [`createPracticeProblems()`](/docs/core/create-pr
 import { PracticeProblems } from "@edu-sdk/react";
 import "@edu-sdk/react/styles.css";
 
-<PracticeProblems problems={problems} />
+<PracticeProblems problems={problems.content} />
 ```
 
 ## Props
@@ -47,7 +47,7 @@ type PracticeProblemsProps = {
 
 ```tsx
 <PracticeProblems
-  problems={problems}
+  problems={problems.content}
   className="my-problems"
   classNames={{
     question: "my-question",

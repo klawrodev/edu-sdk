@@ -29,12 +29,27 @@ const problems = await createPracticeProblems({
 
 ## Returns
 
-`Promise<PracticeProblem[]>`
-
-Each problem contains:
+`Promise<Artifact<PracticeProblem[]>>`
 
 ```ts
 {
+  id: string;
+  title: string;
+  description?: string;
+  metadata: {
+    createdAt: string;
+    model: string;
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: PracticeProblem[];
+}
+```
+
+Each problem in `content` contains:
+
+```ts
+{
+  id: string;
   question: string;
   hint: string;
   answer: string;
@@ -53,6 +68,8 @@ const problems = await createPracticeProblems({
   count: 6,
   difficulty: "hard"
 });
+
+// <PracticeProblems problems={problems.content} />
 ```
 
 Render with [`<PracticeProblems />`](/docs/react/practice-problems).

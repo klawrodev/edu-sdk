@@ -1,6 +1,8 @@
 import { generateText, Output } from "ai";
 import { z } from 'zod';
 import { generationOptionsSchema } from "../shared/schema.js";
+import { artifactLabelSchema, stampLeafIds, wrapArtifact } from "../shared/artifact.js";
+import type { Artifact } from "../shared/artifact.js";
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from "../shared/prompts.js";
 import { InvalidInputError } from "../errors/errors.js";
 
@@ -19,8 +21,9 @@ function createQuizQuestionSchema(numOfOptions: number) {
     });
 }
 
-export type QuizQuestion = z.infer<ReturnType<typeof createQuizQuestionSchema>>;
-type Quiz = QuizQuestion[];
+type QuizQuestionFields = z.infer<ReturnType<typeof createQuizQuestionSchema>>;
+export type QuizQuestion = QuizQuestionFields & { id: string };
+export type Quiz = Artifact<QuizQuestion[]>;
 
 export async function createQuiz(options: CreateQuizOptions): Promise<Quiz> {
     const result = createQuizOptionsSchema.safeParse(options);
@@ -43,17 +46,24 @@ export async function createQuiz(options: CreateQuizOptions): Promise<Quiz> {
                 'Prefer questions that test understanding and application over trivia when the content supports it.',
                 'Avoid duplicate or nearly identical questions.',
                 'Stay grounded in the provided content and do not introduce unsupported information.',
-                'Match the requested difficulty level.'
+                'Match the requested difficulty level.',
+                'Provide a concise title and optional short description for the quiz as a whole.'
             ],
             difficulty,
             content
         }),
         output: Output.object({
-            schema: z.object({
+            schema: artifactLabelSchema.extend({
                 questions: z.array(quizQuestionSchema).length(count)
             })
         })
     });
 
-    return output.questions
+    return wrapArtifact({
+        title: output.title,
+        description: output.description,
+        content: stampLeafIds(output.questions),
+        model,
+        difficulty,
+    });
 }
