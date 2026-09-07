@@ -13,6 +13,9 @@ export type { GradeQuizOptions, GradeQuizResult } from './quizzes/gradeQuiz.js';
 export { createQuizAttempt, completeQuizAttempt } from './assessment/attempt.js';
 export type { QuizAttempt, AssessmentResult, CreateQuizAttemptOptions, CompleteQuizAttemptOptions } from './assessment/attempt.js';
 
+export { createLearningSet } from './learning-set/create-learning-set.js';
+export type { LearningSet, CreateLearningSetOptions } from './learning-set/create-learning-set.js';
+
 export { createStudyGuide } from './studyguide/create-studyguide.js';
 export type { StudyGuide, CreateStudyGuideOptions } from './studyguide/create-studyguide.js';
 
