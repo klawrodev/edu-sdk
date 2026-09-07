@@ -26,4 +26,7 @@ export type { Difficulty } from './shared/schema.js';
 
 export type { Artifact, ArtifactMetadata } from './shared/artifact.js';
 
-export { EduSDKError, InvalidInputError } from './errors/errors.js';
+export { extractContent } from './content/extract-content.js';
+export type { FileContent, ContentInput, ExtractedContent } from './content/types.js';
+
+export { EduSDKError, InvalidInputError, UnsupportedContentError, ContentExtractionError } from './errors/errors.js';

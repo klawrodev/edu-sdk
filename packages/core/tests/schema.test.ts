@@ -38,4 +38,17 @@ describe("generationOptionsSchema model support", () => {
 
         expect(result.success).toBe(false);
     });
+
+    test("accepts FileContent as content", () => {
+        const result = generationOptionsSchema.safeParse({
+            model: "openai/gpt-5",
+            content: {
+                type: "file",
+                data: new TextEncoder().encode("Electricity"),
+                mimeType: "text/plain",
+            },
+        });
+
+        expect(result.success).toBe(true);
+    });
 });

@@ -1,12 +1,19 @@
 ---
 title: Error handling
-description: InvalidInputError and what the SDK does not wrap.
+description: InvalidInputError, content extraction errors, and what the SDK does not wrap.
 ---
 
 `edu-sdk` validates options with Zod before calling the model. Bad options throw `InvalidInputError`, which extends `EduSDKError`.
 
+File extraction failures throw `UnsupportedContentError` (unknown type) or `ContentExtractionError` (empty / unreadable file). Both also extend `EduSDKError`.
+
 ```ts
-import { createQuiz, InvalidInputError } from "edu-sdk";
+import {
+  createQuiz,
+  InvalidInputError,
+  UnsupportedContentError,
+  ContentExtractionError,
+} from "edu-sdk";
 
 try {
   const quiz = await createQuiz({
@@ -17,6 +24,11 @@ try {
 } catch (error) {
   if (error instanceof InvalidInputError) {
     // Empty content, count of 0, invalid difficulty, numOfOptions < 2, ...
+    console.error(error.message);
+  } else if (
+    error instanceof UnsupportedContentError ||
+    error instanceof ContentExtractionError
+  ) {
     console.error(error.message);
   } else {
     throw error;
@@ -30,5 +42,7 @@ Examples of invalid input:
 - `count` of `0` or a non-integer
 - `difficulty` other than `"easy" | "medium" | "hard"`
 - `numOfOptions` less than `2`
+- unsupported file MIME / extension
+- empty or unscannable PDF text
 
 Model, network, and generation failures come from the AI SDK. They are not wrapped in `EduSDKError`.

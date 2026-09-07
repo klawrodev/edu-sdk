@@ -29,9 +29,11 @@ const set = await createLearningSet({
 | Option | Type | Required | Default |
 | --- | --- | --- | --- |
 | `model` | `string \| LanguageModel` | Yes | — |
-| `content` | `string` | Yes | — |
+| `content` | `string \| FileContent` | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
 | `include` | array of include items (min 1) | Yes | — |
+
+`content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes). File content is extracted once before nested generators run.
 
 ### `include` items
 

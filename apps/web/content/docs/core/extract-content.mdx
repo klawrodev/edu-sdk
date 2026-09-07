@@ -1,0 +1,103 @@
+---
+title: extractContent
+description: Extract text from PDF, plain text, or markdown file bytes.
+---
+
+Turns file bytes into text you can inspect, cache, or pass into generators. The SDK does **not** host uploads — your app still handles `<input type="file">`, multipart routes, and storage. Pass the resulting bytes here (or straight into `create*` as `content`).
+
+## Usage
+
+```ts
+import { extractContent, createQuiz } from "edu-sdk";
+import { readFile } from "node:fs/promises";
+
+const data = await readFile("./lecture.pdf");
+
+const extracted = await extractContent({
+  type: "file",
+  data,
+  mimeType: "application/pdf",
+  filename: "lecture.pdf",
+});
+
+console.log(extracted.text, extracted.pageCount);
+
+const quiz = await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content: extracted.text,
+  count: 10,
+});
+```
+
+Or skip the helper and pass a file into a generator:
+
+```ts
+const quiz = await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content: {
+    type: "file",
+    data,
+    mimeType: "application/pdf",
+    filename: "lecture.pdf",
+  },
+  count: 10,
+});
+```
+
+From an upload route:
+
+```ts
+const file = formData.get("file") as File;
+const data = new Uint8Array(await file.arrayBuffer());
+
+await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content: {
+    type: "file",
+    data,
+    mimeType: file.type || "application/octet-stream",
+    filename: file.name,
+  },
+  count: 10,
+});
+```
+
+## Options
+
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `type` | `"file"` | Yes | Discriminator |
+| `data` | `Uint8Array \| ArrayBuffer` | Yes | Node `Buffer` works (it is a `Uint8Array`) |
+| `mimeType` | `string` | Yes | See supported types |
+| `filename` | `string` | No | Used as a fallback when `mimeType` is unknown (e.g. `application/octet-stream`) |
+
+## Supported types (v1)
+
+| MIME | Filename fallback |
+| --- | --- |
+| `application/pdf` | `.pdf` |
+| `text/plain` | `.txt` |
+| `text/markdown` | `.md`, `.markdown` |
+
+Text-based PDFs only. Scanned/image PDFs without OCR are not supported and throw if no text is extracted.
+
+## Returns
+
+```ts
+{
+  text: string;
+  mimeType: string;
+  filename?: string;
+  pageCount?: number; // PDF only
+}
+```
+
+## Errors
+
+| Error | When |
+| --- | --- |
+| `UnsupportedContentError` | Unknown MIME and no usable filename extension |
+| `ContentExtractionError` | Empty bytes, empty extracted text, or PDF parse failure |
+| `InvalidInputError` | Malformed `FileContent` (missing `type`, bad `data`, empty `mimeType`) |
+
+All extend `EduSDKError`.

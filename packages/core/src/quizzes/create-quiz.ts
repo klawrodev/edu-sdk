@@ -5,6 +5,7 @@ import { artifactLabelSchema, stampLeafIds, wrapArtifact } from "../shared/artif
 import type { Artifact } from "../shared/artifact.js";
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from "../shared/prompts.js";
 import { InvalidInputError } from "../errors/errors.js";
+import { resolveContent } from "../content/resolve-content.js";
 
 export const createQuizOptionsSchema = generationOptionsSchema.extend({
     count: z.number().int().positive(),
@@ -31,6 +32,7 @@ export async function createQuiz(options: CreateQuizOptions): Promise<Quiz> {
         throw new InvalidInputError(result.error.issues[0]?.message ?? 'Invalid quiz generation options')
     }
     const { model, content, count, difficulty = 'medium', numOfOptions = 4 } = result.data;
+    const resolvedContent = await resolveContent(content);
 
     const quizQuestionSchema = createQuizQuestionSchema(numOfOptions);
 
@@ -50,7 +52,7 @@ export async function createQuiz(options: CreateQuizOptions): Promise<Quiz> {
                 'Provide a concise title and optional short description for the quiz as a whole.'
             ],
             difficulty,
-            content
+            content: resolvedContent
         }),
         output: Output.object({
             schema: artifactLabelSchema.extend({

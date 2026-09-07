@@ -5,6 +5,7 @@ import { artifactLabelSchema, stampLeafIds, wrapArtifact } from '../shared/artif
 import type { Artifact } from '../shared/artifact.js';
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from '../shared/prompts.js';
 import { InvalidInputError } from '../errors/errors.js';
+import { resolveContent } from '../content/resolve-content.js';
 
 export const createPracticeProblemsOptionsSchema = generationOptionsSchema.extend({
     count: z.number().int().positive()
@@ -29,6 +30,7 @@ export async function createPracticeProblems(options: CreatePracticeProblemsOpti
     }
 
     const { model, content, difficulty='medium', count } = result.data;
+    const resolvedContent = await resolveContent(content);
 
     const { output } = await generateText({
         model,
@@ -58,7 +60,7 @@ export async function createPracticeProblems(options: CreatePracticeProblemsOpti
                 For conceptual problems:
                     - Explain the reasoning behind the answer rather than simply restating it.`
             ],
-            content
+            content: resolvedContent
         }),
         output: Output.object({
             schema: artifactLabelSchema.extend({

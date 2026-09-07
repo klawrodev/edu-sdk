@@ -2,6 +2,7 @@
   "title": "Core",
   "pages": [
     "index",
+    "extract-content",
     "create-flashcards",
     "create-note",
     "create-quiz",
