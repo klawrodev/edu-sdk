@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { generateText } from "ai";
 import { createQuizOptionsSchema, createQuiz } from '../src/quizzes/create-quiz';
+import { eduGeneratorSystemPrompt } from '../src/shared/prompts';
 import { InvalidInputError } from "../src/errors/errors";
 
 vi.mock(import('ai'), async (importOriginal) => {
@@ -183,6 +184,20 @@ describe('createQuiz', () => {
         expect(mockedGenerateText).toHaveBeenCalledWith(
             expect.objectContaining({
                 prompt: expect.stringContaining("4 answer choices")
+            })
+        );
+    });
+
+    test('passes the shared system prompt', async () => {
+        await createQuiz({
+            model: 'google/gemini-3.6-flash',
+            content: 'Electricity',
+            count: 2
+        });
+
+        expect(mockedGenerateText).toHaveBeenCalledWith(
+            expect.objectContaining({
+                system: eduGeneratorSystemPrompt
             })
         );
     });

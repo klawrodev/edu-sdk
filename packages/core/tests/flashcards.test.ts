@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { generateText } from 'ai';
 import { createFlashcardsOptionsSchema, createFlashcards } from '../src/flashcard/create-flashcards';
+import { eduGeneratorSystemPrompt } from '../src/shared/prompts';
 import { InvalidInputError } from '../src/errors/errors';
 
 vi.mock(import('ai'), async(importOriginal) => {
@@ -110,7 +111,7 @@ describe('createFlashcards', () => {
 
         expect(mockedGenerateText).toHaveBeenCalledWith(
             expect.objectContaining({
-                prompt: expect.stringContaining("level: hard")
+                prompt: expect.stringContaining("hard-difficulty")
             })
         );
     });
@@ -124,7 +125,21 @@ describe('createFlashcards', () => {
 
         expect(mockedGenerateText).toHaveBeenCalledWith(
             expect.objectContaining({
-                prompt: expect.stringContaining("level: medium")
+                prompt: expect.stringContaining("medium-difficulty")
+            })
+        );
+    });
+
+    test('passes the shared system prompt', async () => {
+        await createFlashcards({
+            model: 'google/gemini-3.6-flash',
+            content: 'Electricity',
+            count: 2
+        });
+
+        expect(mockedGenerateText).toHaveBeenCalledWith(
+            expect.objectContaining({
+                system: eduGeneratorSystemPrompt
             })
         );
     });

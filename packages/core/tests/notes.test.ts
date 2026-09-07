@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { generateText } from 'ai';
 import { createNote, createNoteOptionsSchema } from '../src/notes/create-note';
+import { eduGeneratorSystemPrompt } from '../src/shared/prompts';
 import { InvalidInputError } from '../src/errors/errors';
 
 vi.mock(import('ai'), async(importOriginal) => {
@@ -119,6 +120,19 @@ describe('createNote', () => {
         expect(mockedGenerateText).toHaveBeenCalledWith(
             expect.objectContaining({
                 prompt: expect.stringContaining("medium length")
+            })
+        );
+    });
+
+    test('passes the shared system prompt', async () => {
+        await createNote({
+            model: 'google/gemini-3.6-flash',
+            content: 'Electricity'
+        });
+
+        expect(mockedGenerateText).toHaveBeenCalledWith(
+            expect.objectContaining({
+                system: eduGeneratorSystemPrompt
             })
         );
     });
