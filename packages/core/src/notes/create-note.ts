@@ -5,6 +5,7 @@ import { artifactLabelSchema, wrapArtifact } from "../shared/artifact.js";
 import type { Artifact } from "../shared/artifact.js";
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from "../shared/prompts.js";
 import { InvalidInputError } from "../errors/errors.js";
+import { resolveContent } from "../content/resolve-content.js";
 
 export const createNoteOptionsSchema = generationOptionsSchema.extend({
     length: z.enum(["short", "medium", "long"]).optional()
@@ -31,6 +32,7 @@ export async function createNote(options: CreateNoteOptions): Promise<Note> {
     }
 
     const { model, content, difficulty = 'medium', length = 'medium' } = result.data;
+    const resolvedContent = await resolveContent(content);
 
     const { output } = await generateText({
         model,
@@ -47,7 +49,7 @@ export async function createNote(options: CreateNoteOptions): Promise<Note> {
                 'Provide a concise title and optional short description for the note as a whole.'
             ],
             difficulty,
-            content
+            content: resolvedContent
         }),
         output: Output.object({
             schema: noteOutputSchema

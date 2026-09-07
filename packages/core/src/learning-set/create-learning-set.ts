@@ -3,6 +3,7 @@ import { generationOptionsSchema } from "../shared/schema.js";
 import { wrapArtifact } from "../shared/artifact.js";
 import type { Artifact } from "../shared/artifact.js";
 import { InvalidInputError } from "../errors/errors.js";
+import { resolveContent } from "../content/resolve-content.js";
 import { createQuiz } from "../quizzes/create-quiz.js";
 import type { Quiz } from "../quizzes/create-quiz.js";
 import { createFlashcards } from "../flashcard/create-flashcards.js";
@@ -73,7 +74,8 @@ export async function createLearningSet(options: CreateLearningSetOptions): Prom
     }
 
     const { model, content, difficulty = "medium", include } = parsed.data;
-    const shared = { model, content, difficulty };
+    const resolvedContent = await resolveContent(content);
+    const shared = { model, content: resolvedContent, difficulty };
 
     const entries = await Promise.all(
         include.map(async (item) => {

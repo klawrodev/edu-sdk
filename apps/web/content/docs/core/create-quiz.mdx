@@ -24,10 +24,12 @@ const quiz = await createQuiz({
 | Option | Type | Required | Default |
 | --- | --- | --- | --- |
 | `model` | `string \| LanguageModel` | Yes | — |
-| `content` | `string` | Yes | — |
+| `content` | `string \| FileContent` | Yes | — |
 | `count` | `number` (positive int) | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
 | `numOfOptions` | `number` (min 2) | No | `4` |
+
+`content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
 
 ## Returns
 

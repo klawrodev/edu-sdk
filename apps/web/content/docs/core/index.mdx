@@ -3,7 +3,9 @@ title: Core
 description: Generation APIs in the edu-sdk package.
 ---
 
-`edu-sdk` generates learning materials from content. Pass a `model` (string ID or AI SDK `LanguageModel`), `content`, and optional `difficulty` (`easy` | `medium` | `hard`).
+`edu-sdk` generates learning materials from content. Pass a `model` (string ID or AI SDK `LanguageModel`), `content` (`string` or [`FileContent`](/docs/core/extract-content)), and optional `difficulty` (`easy` | `medium` | `hard`).
+
+Use [`extractContent()`](/docs/core/extract-content) to turn PDF / text / markdown bytes into a string first, or pass a file object directly as `content` on any `create*` call.
 
 Every generator returns an `Artifact<T>` envelope:
 
@@ -19,6 +21,7 @@ Every generator returns an `Artifact<T>` envelope:
 
 | Function | `content` type |
 | --- | --- |
+| [`extractContent()`](/docs/core/extract-content) | Returns extracted text from file bytes (not an artifact) |
 | [`createFlashcards()`](/docs/core/create-flashcards) | `Flashcard[]` (each with `id`) |
 | [`createNote()`](/docs/core/create-note) | Markdown `string` |
 | [`createQuiz()`](/docs/core/create-quiz) | `QuizQuestion[]` (each with `id`) |
@@ -26,6 +29,6 @@ Every generator returns an `Artifact<T>` envelope:
 | [`createPracticeProblems()`](/docs/core/create-practice-problems) | `PracticeProblem[]` (each with `id`) |
 | [`createLearningSet()`](/docs/core/create-learning-set) | Nested artifacts chosen via `include` |
 
-Invalid options throw [`InvalidInputError`](/docs/guides/error-handling).
+Invalid options throw [`InvalidInputError`](/docs/guides/error-handling). Unsupported or empty files throw `UnsupportedContentError` / `ContentExtractionError`.
 
 See [Quick Start](/docs/getting-started/quick-start) for a full `createQuiz` example.

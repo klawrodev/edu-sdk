@@ -22,8 +22,10 @@ const studyGuide = await createStudyGuide({
 | Option | Type | Required | Default |
 | --- | --- | --- | --- |
 | `model` | `string \| LanguageModel` | Yes | — |
-| `content` | `string` | Yes | — |
+| `content` | `string \| FileContent` | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
+
+`content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
 
 ## Returns
 

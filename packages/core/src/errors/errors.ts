@@ -11,3 +11,17 @@ export class InvalidInputError extends EduSDKError {
         this.name = "InvalidInputError";
     }
 }
+
+export class UnsupportedContentError extends EduSDKError {
+    constructor(message: string) {
+        super(message);
+        this.name = "UnsupportedContentError";
+    }
+}
+
+export class ContentExtractionError extends EduSDKError {
+    constructor(message: string) {
+        super(message);
+        this.name = "ContentExtractionError";
+    }
+}

@@ -5,6 +5,7 @@ import { artifactLabelSchema, wrapArtifact } from '../shared/artifact.js';
 import type { Artifact } from '../shared/artifact.js';
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from '../shared/prompts.js';
 import { InvalidInputError } from '../errors/errors.js';
+import { resolveContent } from '../content/resolve-content.js';
 
 
 export const createStudyGuideOptionsSchema = generationOptionsSchema;
@@ -39,6 +40,7 @@ export async function createStudyGuide(options: CreateStudyGuideOptions): Promis
     }
 
     const { model, content, difficulty='medium' } = result.data;
+    const resolvedContent = await resolveContent(content);
 
     const { output } = await generateText({
         model,
@@ -55,7 +57,7 @@ export async function createStudyGuide(options: CreateStudyGuideOptions): Promis
                 'Provide a concise title and optional short description for the study guide as a whole.'
             ],
             difficulty,
-            content
+            content: resolvedContent
         }),
         output: Output.object({
             schema: studyGuideOutputSchema

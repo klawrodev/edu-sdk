@@ -1,39 +1,40 @@
 {
-    "name": "edu-sdk",
-    "version": "0.5.0",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/klawrodev/edu-sdk.git",
-        "directory": "packages/core"
-    },
-    "type": "module",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.js",
-        "default": "./dist/index.js"
-      }
-    },
-    "files": [
-      "dist"
-    ],
-    "scripts": {
-      "build": "tsc",
-      "test": "vitest",
-      "test:run": "vitest run"
-    },
-    "devDependencies": {
-      "@types/json-schema": "^7.0.15",
-      "@types/node": "^26.4.0",
-      "typescript": "^5",
-      "vitest": "^4.1.11"
-    },
-    "dependencies": {
-      "@ai-sdk/openai": "^4.0.52",
-      "ai": "^7.0.79",
-      "zod": "^4.4.3"
+  "name": "edu-sdk",
+  "version": "0.5.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/klawrodev/edu-sdk.git",
+    "directory": "packages/core"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "devDependencies": {
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^26.4.0",
+    "typescript": "^5",
+    "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^4.0.52",
+    "ai": "^7.0.79",
+    "unpdf": "^1.8.1",
+    "zod": "^4.4.3"
+  }
 }

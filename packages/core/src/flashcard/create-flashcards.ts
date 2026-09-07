@@ -5,6 +5,7 @@ import { artifactLabelSchema, stampLeafIds, wrapArtifact } from '../shared/artif
 import type { Artifact } from '../shared/artifact.js';
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from '../shared/prompts.js';
 import { InvalidInputError } from '../errors/errors.js';
+import { resolveContent } from '../content/resolve-content.js';
 
 export const createFlashcardsOptionsSchema = generationOptionsSchema.extend({
     count: z.number().int().positive()
@@ -28,6 +29,7 @@ export async function createFlashcards(options: CreateFlashcardsOptions): Promis
     }
     
     const { model, content, count, difficulty = 'medium' } = result.data;
+    const resolvedContent = await resolveContent(content);
 
     const { output }  = await generateText({
         model,
@@ -44,7 +46,7 @@ export async function createFlashcards(options: CreateFlashcardsOptions): Promis
                 'Provide a concise title and optional short description for the flashcard deck as a whole.'
             ],
             difficulty,
-            content
+            content: resolvedContent
         }),
         output: Output.object({
             schema: artifactLabelSchema.extend({

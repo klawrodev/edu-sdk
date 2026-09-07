@@ -10,11 +10,28 @@ const languageModelSchema = z.custom<LanguageModel>(
     "Model must be a model ID or LanguageModel"
 );
 
+const binaryDataSchema = z.custom<Uint8Array | ArrayBuffer>(
+    (value) => value instanceof Uint8Array || value instanceof ArrayBuffer,
+    "FileContent.data must be a Uint8Array or ArrayBuffer"
+);
+
+export const fileContentSchema = z.object({
+    type: z.literal("file"),
+    data: binaryDataSchema,
+    mimeType: z.string().min(1, "mimeType must be a non-empty string"),
+    filename: z.string().min(1).optional(),
+});
+
+export const contentInputSchema = z.union([
+    z.string().min(1, "Content cannot be empty"),
+    fileContentSchema,
+]);
+
 export const generationOptionsSchema = z.object({
     model: z.union([
         z.string().min(1, "Model must be supplied"),
         languageModelSchema
     ]),
-    content: z.string().min(1, "Content cannot be empty"),
+    content: contentInputSchema,
     difficulty: difficultySchema.optional()
 });
