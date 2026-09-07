@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { generateText } from "ai";
 import { createPracticeProblems, createPracticeProblemsOptionsSchema } from '../src/practice-problems/create-practice-problems';
+import { eduGeneratorSystemPrompt } from '../src/shared/prompts';
 import { InvalidInputError } from "../src/errors/errors";
 
 vi.mock(import('ai'), async (importOriginal) => {
@@ -125,6 +126,20 @@ describe('createPracticeProblems', () => {
         expect(mockedGenerateText).toHaveBeenCalledWith(
             expect.objectContaining({
                 prompt: expect.stringContaining("medium-difficulty")
+            })
+        );
+    });
+
+    test('passes the shared system prompt', async () => {
+        await createPracticeProblems({
+            model: 'google/gemini-3.6-flash',
+            content: 'Electricity',
+            count: 2
+        });
+
+        expect(mockedGenerateText).toHaveBeenCalledWith(
+            expect.objectContaining({
+                system: eduGeneratorSystemPrompt
             })
         );
     });
