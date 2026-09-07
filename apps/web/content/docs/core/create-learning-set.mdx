@@ -1,9 +1,9 @@
 ---
 title: createLearningSet
-description: Generate a quiz, flashcards, and notes from the same content in one call.
+description: Generate any mix of learning artifacts from the same content in one call.
 ---
 
-Runs [`createQuiz()`](/docs/core/create-quiz), [`createFlashcards()`](/docs/core/create-flashcards), and [`createNote()`](/docs/core/create-note) in parallel from shared `model`, `content`, and `difficulty`.
+Runs the generators you list in `include` in parallel from shared `model`, `content`, and `difficulty`. Supported types: [`createQuiz()`](/docs/core/create-quiz), [`createFlashcards()`](/docs/core/create-flashcards), [`createPracticeProblems()`](/docs/core/create-practice-problems), [`createNote()`](/docs/core/create-note), and [`createStudyGuide()`](/docs/core/create-study-guide).
 
 ## Usage
 
@@ -14,9 +14,13 @@ const set = await createLearningSet({
   model: "google/gemini-3.6-flash",
   content,
   difficulty: "medium",
-  quiz: { count: 10, numOfOptions: 4 },
-  flashcards: { count: 12 },
-  notes: { length: "medium" }
+  include: [
+    { type: "quiz", count: 10, numOfOptions: 4 },
+    { type: "flashcards", count: 12 },
+    { type: "practiceProblems", count: 5 },
+    { type: "notes", length: "medium" },
+    { type: "studyGuide" },
+  ],
 });
 ```
 
@@ -27,16 +31,23 @@ const set = await createLearningSet({
 | `model` | `string \| LanguageModel` | Yes | — |
 | `content` | `string` | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
-| `quiz.count` | `number` (positive int) | Yes | — |
-| `quiz.numOfOptions` | `number` (min 2) | No | `4` |
-| `flashcards.count` | `number` (positive int) | Yes | — |
-| `notes.length` | `"short" \| "medium" \| "long"` | No | `"medium"` |
+| `include` | array of include items (min 1) | Yes | — |
 
-`notes` itself is optional; omit it to use note defaults.
+### `include` items
+
+Each entry has a `type`. Duplicate types are rejected.
+
+| `type` | Extra fields | Notes |
+| --- | --- | --- |
+| `"quiz"` | `count` (required), `numOfOptions` (optional, min 2, default `4`) | — |
+| `"flashcards"` | `count` (required) | — |
+| `"practiceProblems"` | `count` (required) | — |
+| `"notes"` | `length?: "short" \| "medium" \| "long"` | Defaults to `"medium"` |
+| `"studyGuide"` | — | Uses shared options only |
 
 ## Returns
 
-`Promise<Artifact<{ quiz; flashcards; notes }>>`
+`Promise<Artifact<LearningSetContent>>` where `LearningSetContent` only includes keys for the types you requested:
 
 ```ts
 {
@@ -49,14 +60,16 @@ const set = await createLearningSet({
     difficulty: "easy" | "medium" | "hard";
   };
   content: {
-    quiz: Artifact<QuizQuestion[]>;
-    flashcards: Artifact<Flashcard[]>;
-    notes: Artifact<string>;
+    quiz?: Artifact<QuizQuestion[]>;
+    flashcards?: Artifact<Flashcard[]>;
+    practiceProblems?: Artifact<PracticeProblem[]>;
+    notes?: Artifact<string>;
+    studyGuide?: Artifact<StudyGuideContent>;
   };
 }
 ```
 
-The outer envelope uses the notes artifact’s title (and description when present). Each nested value is a full artifact from the corresponding helper.
+The outer envelope prefers title/description from notes, then study guide, quiz, flashcards, then practice problems (with a `"Learning set"` fallback title). Each nested value is a full artifact from the corresponding helper.
 
 If any helper fails, the whole call fails.
 
@@ -68,11 +81,13 @@ import { createLearningSet } from "edu-sdk";
 const set = await createLearningSet({
   model: "google/gemini-3.6-flash",
   content: lectureNotes,
-  quiz: { count: 5 },
-  flashcards: { count: 8 }
+  include: [
+    { type: "quiz", count: 5 },
+    { type: "flashcards", count: 8 },
+  ],
 });
 
-const { quiz, flashcards, notes } = set.content;
+const { quiz, flashcards } = set.content;
 ```
 
 Invalid input throws `InvalidInputError`.
