@@ -5,6 +5,7 @@
     "create-flashcards",
     "create-note",
     "create-quiz",
+    "create-learning-set",
     "grade-quiz",
     "assessment",
     "create-study-guide",

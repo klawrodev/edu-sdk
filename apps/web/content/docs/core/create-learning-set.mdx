@@ -1,0 +1,64 @@
+---
+title: createLearningSet
+description: Generate a quiz, flashcards, and notes from the same content in one call.
+---
+
+Runs [`createQuiz()`](/docs/core/create-quiz), [`createFlashcards()`](/docs/core/create-flashcards), and [`createNote()`](/docs/core/create-note) in parallel from shared `model`, `content`, and `difficulty`.
+
+## Usage
+
+```ts
+import { createLearningSet } from "edu-sdk";
+
+const set = await createLearningSet({
+  model: "google/gemini-3.6-flash",
+  content,
+  difficulty: "medium",
+  quiz: { count: 10, numOfOptions: 4 },
+  flashcards: { count: 12 },
+  notes: { length: "medium" }
+});
+```
+
+## Options
+
+| Option | Type | Required | Default |
+| --- | --- | --- | --- |
+| `model` | `string \| LanguageModel` | Yes | — |
+| `content` | `string` | Yes | — |
+| `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
+| `quiz.count` | `number` (positive int) | Yes | — |
+| `quiz.numOfOptions` | `number` (min 2) | No | `4` |
+| `flashcards.count` | `number` (positive int) | Yes | — |
+| `notes.length` | `"short" \| "medium" \| "long"` | No | `"medium"` |
+
+`notes` itself is optional; omit it to use note defaults.
+
+## Returns
+
+`Promise<LearningSet>`
+
+```ts
+{
+  quiz: QuizQuestion[];
+  flashcards: Flashcard[];
+  notes: Note;
+}
+```
+
+If any helper fails, the whole call fails.
+
+## Example
+
+```ts
+import { createLearningSet } from "edu-sdk";
+
+const { quiz, flashcards, notes } = await createLearningSet({
+  model: "google/gemini-3.6-flash",
+  content: lectureNotes,
+  quiz: { count: 5 },
+  flashcards: { count: 8 }
+});
+```
+
+Invalid input throws `InvalidInputError`.

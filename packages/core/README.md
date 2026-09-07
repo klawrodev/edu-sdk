@@ -38,6 +38,7 @@ const quiz = await createQuiz({
 | Function | Description |
 | --- | --- |
 | `createQuiz` | Multiple-choice questions |
+| `createLearningSet` | Quiz, flashcards, and notes in one call |
 | `gradeQuiz` | Score submitted quiz answers |
 | `createQuizAttempt` | Start a quiz attempt record |
 | `completeQuizAttempt` | Finish an attempt and grade it |
