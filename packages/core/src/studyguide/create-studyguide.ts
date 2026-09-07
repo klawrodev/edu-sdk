@@ -30,7 +30,7 @@ export type StudyGuideContent = {
     reviewQuestions: string[];
 };
 
-type StudyGuide = Artifact<StudyGuideContent>;
+export type StudyGuide = Artifact<StudyGuideContent>;
 
 export async function createStudyGuide(options: CreateStudyGuideOptions): Promise<StudyGuide> {
     const result = createStudyGuideOptionsSchema.safeParse(options);

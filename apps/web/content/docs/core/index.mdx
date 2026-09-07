@@ -24,7 +24,7 @@ Every generator returns an `Artifact<T>` envelope:
 | [`createQuiz()`](/docs/core/create-quiz) | `QuizQuestion[]` (each with `id`) |
 | [`createStudyGuide()`](/docs/core/create-study-guide) | `StudyGuideContent` |
 | [`createPracticeProblems()`](/docs/core/create-practice-problems) | `PracticeProblem[]` (each with `id`) |
-| [`createLearningSet()`](/docs/core/create-learning-set) | Nested quiz, flashcards, and notes artifacts |
+| [`createLearningSet()`](/docs/core/create-learning-set) | Nested artifacts chosen via `include` |
 
 Invalid options throw [`InvalidInputError`](/docs/guides/error-handling).
 

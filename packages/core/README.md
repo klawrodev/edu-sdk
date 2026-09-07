@@ -57,7 +57,7 @@ console.log(quiz.title, quiz.content);
 | Function | Description |
 | --- | --- |
 | `createQuiz` | Multiple-choice questions |
-| `createLearningSet` | Quiz, flashcards, and notes in one call |
+| `createLearningSet` | Choose quiz, flashcards, practice problems, notes, and/or study guide in one call |
 | `gradeQuiz` | Score submitted quiz answers |
 | `createQuizAttempt` | Start a quiz attempt record |
 | `completeQuizAttempt` | Finish an attempt and grade it |
