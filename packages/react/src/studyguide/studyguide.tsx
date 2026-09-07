@@ -1,4 +1,4 @@
-import type { StudyGuide as StudyGuideData } from "edu-sdk";
+import type { Artifact, StudyGuideContent } from "edu-sdk";
 import { cn } from "../utils/index.js";
 
 export type StudyGuideClassNames = {
@@ -14,6 +14,8 @@ export type StudyGuideClassNames = {
     reviewQuestions?: string;
     reviewQuestion?: string;
 };
+
+type StudyGuideData = Artifact<StudyGuideContent>;
 
 export type StudyGuideProps = {
     studyGuide: StudyGuideData;
