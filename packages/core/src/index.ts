@@ -10,6 +10,9 @@ export type { QuizQuestion, CreateQuizOptions } from './quizzes/create-quiz.js';
 export { gradeQuiz } from './quizzes/gradeQuiz.js';
 export type { GradeQuizOptions, GradeQuizResult } from './quizzes/gradeQuiz.js';
 
+export { createQuizAttempt, completeQuizAttempt } from './assessment/attempt.js';
+export type { QuizAttempt, AssessmentResult, CreateQuizAttemptOptions, CompleteQuizAttemptOptions } from './assessment/attempt.js';
+
 export { createStudyGuide } from './studyguide/create-studyguide.js';
 export type { StudyGuide, CreateStudyGuideOptions } from './studyguide/create-studyguide.js';
 
