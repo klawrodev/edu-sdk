@@ -36,15 +36,27 @@ const set = await createLearningSet({
 
 ## Returns
 
-`Promise<LearningSet>`
+`Promise<Artifact<{ quiz; flashcards; notes }>>`
 
 ```ts
 {
-  quiz: QuizQuestion[];
-  flashcards: Flashcard[];
-  notes: Note;
+  id: string;
+  title: string;
+  description?: string;
+  metadata: {
+    createdAt: string;
+    model: string;
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: {
+    quiz: Artifact<QuizQuestion[]>;
+    flashcards: Artifact<Flashcard[]>;
+    notes: Artifact<string>;
+  };
 }
 ```
+
+The outer envelope uses the notes artifact’s title (and description when present). Each nested value is a full artifact from the corresponding helper.
 
 If any helper fails, the whole call fails.
 
@@ -53,12 +65,14 @@ If any helper fails, the whole call fails.
 ```ts
 import { createLearningSet } from "edu-sdk";
 
-const { quiz, flashcards, notes } = await createLearningSet({
+const set = await createLearningSet({
   model: "google/gemini-3.6-flash",
   content: lectureNotes,
   quiz: { count: 5 },
   flashcards: { count: 8 }
 });
+
+const { quiz, flashcards, notes } = set.content;
 ```
 
 Invalid input throws `InvalidInputError`.

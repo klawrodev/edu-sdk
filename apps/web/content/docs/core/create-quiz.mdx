@@ -31,19 +31,34 @@ const quiz = await createQuiz({
 
 ## Returns
 
-`Promise<QuizQuestion[]>`
-
-Each question contains:
+`Promise<Artifact<QuizQuestion[]>>`
 
 ```ts
 {
+  id: string;
+  title: string;
+  description?: string;
+  metadata: {
+    createdAt: string;
+    model: string;
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: QuizQuestion[];
+}
+```
+
+Each question in `content` contains:
+
+```ts
+{
+  id: string;
   question: string;
   options: string[];
   correctAnswer: number;
 }
 ```
 
-`correctAnswer` is zero-indexed.
+`correctAnswer` is zero-indexed. Artifact `id` / leaf `id`s and `metadata` are SDK-generated; `title` and optional `description` come from the model.
 
 ## Example
 
@@ -56,6 +71,9 @@ const quiz = await createQuiz({
   count: 10,
   difficulty: "medium"
 });
+
+// Pass questions into the React component:
+// <Quiz questions={quiz.content} />
 ```
 
 Render with [`<Quiz />`](/docs/react/quiz).

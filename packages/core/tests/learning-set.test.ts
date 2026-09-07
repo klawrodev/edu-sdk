@@ -33,16 +33,47 @@ const mockedCreateQuiz = vi.mocked(createQuiz);
 const mockedCreateFlashcards = vi.mocked(createFlashcards);
 const mockedCreateNote = vi.mocked(createNote);
 
-const quiz = [
-    {
-        question: "What is voltage?",
-        options: ["Electrical potential difference", "Resistance", "Current", "Power"],
-        correctAnswer: 0,
+const quiz = {
+    id: "quiz-1",
+    title: "Electricity Quiz",
+    description: "Quiz description",
+    metadata: {
+        createdAt: "2026-01-01T00:00:00.000Z",
+        model: "google/gemini-3.6-flash",
+        difficulty: "medium" as const,
     },
-];
+    content: [
+        {
+            id: "q1",
+            question: "What is voltage?",
+            options: ["Electrical potential difference", "Resistance", "Current", "Power"],
+            correctAnswer: 0,
+        },
+    ],
+};
 
-const flashcards = [{ front: "Voltage", back: "Electrical potential difference" }];
-const notes = "# Electricity\n\nVoltage is potential difference.";
+const flashcards = {
+    id: "cards-1",
+    title: "Electricity Cards",
+    metadata: {
+        createdAt: "2026-01-01T00:00:00.000Z",
+        model: "google/gemini-3.6-flash",
+        difficulty: "medium" as const,
+    },
+    content: [{ id: "c1", front: "Voltage", back: "Electrical potential difference" }],
+};
+
+const notes = {
+    id: "note-1",
+    title: "Electricity Notes",
+    description: "Lecture notes",
+    metadata: {
+        createdAt: "2026-01-01T00:00:00.000Z",
+        model: "google/gemini-3.6-flash",
+        difficulty: "medium" as const,
+    },
+    content: "# Electricity\n\nVoltage is potential difference.",
+};
 
 describe("createLearningSetOptionsSchema", () => {
     test("rejects a quiz count of zero", () => {
@@ -77,7 +108,7 @@ describe("createLearningSet", () => {
         mockedCreateNote.mockResolvedValue(notes);
     });
 
-    test("returns quiz, flashcards, and notes from the helpers", async () => {
+    test("returns an artifact wrapping quiz, flashcards, and notes", async () => {
         const result = await createLearningSet({
             model: "google/gemini-3.6-flash",
             content: "Electricity",
@@ -85,7 +116,15 @@ describe("createLearningSet", () => {
             flashcards: { count: 8 },
         });
 
-        expect(result).toEqual({ quiz, flashcards, notes });
+        expect(result.title).toBe(notes.title);
+        expect(result.description).toBe(notes.description);
+        expect(result.id).toEqual(expect.any(String));
+        expect(result.metadata).toEqual({
+            createdAt: expect.any(String),
+            model: "google/gemini-3.6-flash",
+            difficulty: "medium",
+        });
+        expect(result.content).toEqual({ quiz, flashcards, notes });
     });
 
     test("passes shared and nested options through to each helper", async () => {

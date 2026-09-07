@@ -82,11 +82,15 @@ describe('createQuiz', () => {
     beforeEach(() => {
         mockedGenerateText.mockReset();
         mockedGenerateText.mockResolvedValue({
-            output: { questions }
+            output: {
+                title: 'Electricity Quiz',
+                description: 'Basic electricity concepts',
+                questions,
+            }
         } as any);
     });
 
-    test('returns generated quiz questions', async () => {
+    test('returns an artifact with stamped question ids', async () => {
         const result = await createQuiz({
             model: 'google/gemini-3.6-flash',
             content: 'Electricity',
@@ -94,7 +98,23 @@ describe('createQuiz', () => {
             numOfOptions: 4
         });
 
-        expect(result).toEqual(questions);
+        expect(result.title).toBe('Electricity Quiz');
+        expect(result.description).toBe('Basic electricity concepts');
+        expect(result.metadata).toEqual({
+            createdAt: expect.any(String),
+            model: 'google/gemini-3.6-flash',
+            difficulty: 'medium',
+        });
+        expect(result.id).toEqual(expect.any(String));
+        expect(result.content).toHaveLength(2);
+        expect(result.content[0]).toEqual({
+            ...questions[0],
+            id: expect.any(String),
+        });
+        expect(result.content[1]).toEqual({
+            ...questions[1],
+            id: expect.any(String),
+        });
     });
 
     test('does not call generateText for invalid input', async () => {

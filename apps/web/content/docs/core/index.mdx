@@ -5,13 +5,26 @@ description: Generation APIs in the edu-sdk package.
 
 `edu-sdk` generates learning materials from content. Pass a `model` (string ID or AI SDK `LanguageModel`), `content`, and optional `difficulty` (`easy` | `medium` | `hard`).
 
-| Function | Returns |
+Every generator returns an `Artifact<T>` envelope:
+
+```ts
+{
+  id: string;
+  title: string;
+  description?: string;
+  metadata: { createdAt: string; model: string; difficulty: Difficulty };
+  content: T;
+}
+```
+
+| Function | `content` type |
 | --- | --- |
-| [`createFlashcards()`](/docs/core/create-flashcards) | `Flashcard[]` |
+| [`createFlashcards()`](/docs/core/create-flashcards) | `Flashcard[]` (each with `id`) |
 | [`createNote()`](/docs/core/create-note) | Markdown `string` |
-| [`createQuiz()`](/docs/core/create-quiz) | `QuizQuestion[]` |
-| [`createStudyGuide()`](/docs/core/create-study-guide) | `StudyGuide` |
-| [`createPracticeProblems()`](/docs/core/create-practice-problems) | `PracticeProblem[]` |
+| [`createQuiz()`](/docs/core/create-quiz) | `QuizQuestion[]` (each with `id`) |
+| [`createStudyGuide()`](/docs/core/create-study-guide) | `StudyGuideContent` |
+| [`createPracticeProblems()`](/docs/core/create-practice-problems) | `PracticeProblem[]` (each with `id`) |
+| [`createLearningSet()`](/docs/core/create-learning-set) | Nested quiz, flashcards, and notes artifacts |
 
 Invalid options throw [`InvalidInputError`](/docs/guides/error-handling).
 

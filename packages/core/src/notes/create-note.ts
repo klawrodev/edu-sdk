@@ -1,18 +1,22 @@
-import { generateText } from "ai";
-import { z } from 'zod';
+import { generateText, Output } from "ai";
+import { z } from "zod";
 import { generationOptionsSchema } from "../shared/schema.js";
+import { artifactLabelSchema, wrapArtifact } from "../shared/artifact.js";
+import type { Artifact } from "../shared/artifact.js";
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from "../shared/prompts.js";
 import { InvalidInputError } from "../errors/errors.js";
 
 export const createNoteOptionsSchema = generationOptionsSchema.extend({
-    length: z.enum(['short', 'medium', 'long']).optional()
+    length: z.enum(["short", "medium", "long"]).optional()
 });
 
 export type CreateNoteOptions = z.infer<typeof createNoteOptionsSchema>;
 
-const noteSchema = z.string().min(1).describe('The content of the notes in markdown');
+const noteOutputSchema = artifactLabelSchema.extend({
+    body: z.string().min(1).describe('The content of the notes in markdown'),
+});
 
-export type Note = z.infer<typeof noteSchema>;
+export type Note = Artifact<string>;
 
 const lengthGuidance = {
     short: 'Keep the note brief and focused on the most essential points.',
@@ -28,23 +32,33 @@ export async function createNote(options: CreateNoteOptions): Promise<Note> {
 
     const { model, content, difficulty = 'medium', length = 'medium' } = result.data;
 
-    const { text } = await generateText({
+    const { output } = await generateText({
         model,
         system: eduGeneratorSystemPrompt,
         prompt: buildGenerationPrompt({
             task: `Create a ${difficulty}-difficulty note of approximately ${length} length using the provided content.`,
             rules: [
-                'Format the note in Markdown.',
+                'Format the note body in Markdown.',
                 'Use headings to organize sections and bold important terms and concepts.',
                 lengthGuidance[length],
                 'Use depth and vocabulary appropriate to the requested difficulty.',
                 'Stay grounded in the provided content and do not introduce unsupported information.',
-                'Match the requested difficulty level.'
+                'Match the requested difficulty level.',
+                'Provide a concise title and optional short description for the note as a whole.'
             ],
             difficulty,
             content
+        }),
+        output: Output.object({
+            schema: noteOutputSchema
         })
     });
 
-    return text;
+    return wrapArtifact({
+        title: output.title,
+        description: output.description,
+        content: output.body,
+        model,
+        difficulty,
+    });
 }

@@ -37,21 +37,33 @@ describe('createNotesOptionschema', () => {
 });
 
 describe('createNote', () => {
-    const content = '...';
+    const body = '# Electricity\n\nVoltage is potential difference.';
     beforeEach(() => {
         mockedGenerateText.mockReset();
         mockedGenerateText.mockResolvedValue({
-            text: content
+            output: {
+                title: 'Electricity Notes',
+                description: 'Lecture summary',
+                body,
+            }
         } as any);
     });
 
-    test('returns generated note', async () => {
+    test('returns an artifact with markdown content', async () => {
         const result = await createNote({
             model: 'google/gemini-3.6-flash',
             content: 'Electricity',
         });
 
-        expect(result).toBe(content);
+        expect(result.title).toBe('Electricity Notes');
+        expect(result.description).toBe('Lecture summary');
+        expect(result.content).toBe(body);
+        expect(result.metadata).toEqual({
+            createdAt: expect.any(String),
+            model: 'google/gemini-3.6-flash',
+            difficulty: 'medium',
+        });
+        expect(result.id).toEqual(expect.any(String));
     });
 
     test('uses the right model', async () => {

@@ -35,7 +35,7 @@ const quiz = await createQuiz({
 export function QuizDemo() {
   return (
     <Quiz
-      questions={quiz}
+      questions={quiz.content}
       onComplete={(result) => {
         console.log(result.score, result.total);
       }}
@@ -65,10 +65,10 @@ import {
   PracticeProblems,
 } from "@edu-sdk/react";
 
-<Quiz questions={quiz} />
-<Flashcards flashcards={cards} />
+<Quiz questions={quiz.content} />
+<Flashcards flashcards={cards.content} />
 <StudyGuide studyGuide={guide} />
-<PracticeProblems problems={problems} />
+<PracticeProblems problems={problems.content} />
 ```
 
 ## Styling

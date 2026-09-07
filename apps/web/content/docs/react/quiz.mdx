@@ -14,7 +14,7 @@ import { Quiz } from "@edu-sdk/react";
 import "@edu-sdk/react/styles.css";
 
 <Quiz
-  questions={quiz}
+  questions={quiz.content}
   onComplete={(result) => {
     console.log(result.score, result.percentage);
   }}
@@ -57,7 +57,7 @@ type QuizProps = {
 
 ```tsx
 <Quiz
-  questions={quiz}
+  questions={quiz.content}
   className="my-quiz"
   classNames={{
     question: "my-question",

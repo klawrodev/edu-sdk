@@ -49,18 +49,33 @@ describe('createFlashcards', () => {
     beforeEach(() => {
         mockedGenerateText.mockReset();
         mockedGenerateText.mockResolvedValue({
-            output: { cards }
+            output: {
+                title: 'Electricity Cards',
+                description: 'Core electricity terms',
+                cards,
+            }
         } as any);
     });
 
-    test('returns generated flashcards', async () => {
+    test('returns an artifact with stamped card ids', async () => {
         const result = await createFlashcards({
             model: 'google/gemini-3.6-flash',
             content: 'Electricity',
             count: 2
         });
 
-        expect(result).toEqual(cards);
+        expect(result.title).toBe('Electricity Cards');
+        expect(result.description).toBe('Core electricity terms');
+        expect(result.metadata).toEqual({
+            createdAt: expect.any(String),
+            model: 'google/gemini-3.6-flash',
+            difficulty: 'medium',
+        });
+        expect(result.id).toEqual(expect.any(String));
+        expect(result.content).toEqual([
+            { ...cards[0], id: expect.any(String) },
+            { ...cards[1], id: expect.any(String) },
+        ]);
     });
 
     test('does not call generateText for invalid input', async () => {
