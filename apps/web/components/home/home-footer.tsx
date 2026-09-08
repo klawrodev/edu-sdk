@@ -5,6 +5,7 @@ const links = [
   { href: '/docs/getting-started/quick-start', label: 'Quick Start' },
   { href: '/docs/core', label: 'Core' },
   { href: '/docs/react', label: 'React' },
+  { href: '/docs/guides', label: 'Guides' },
 ];
 
 export function HomeFooter() {

@@ -1,5 +1,6 @@
 {
   "title": "Getting Started",
+  "pagesIndex": "index",
   "pages": ["installation", "quick-start", "concepts"],
   "defaultOpen": true
 }

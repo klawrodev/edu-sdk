@@ -43,8 +43,6 @@ try {
 - `difficulty` other than `"easy" | "medium" | "hard"`
 - `numOfOptions` less than `2`
 - duplicate types in `createLearningSet` `include`
-- unsupported file MIME / extension
-- empty or unscannable PDF text
 
 ### Study sessions
 
@@ -54,6 +52,15 @@ try {
 - block durations sum to a value more than ±5 minutes from `durationMinutes`
 - a block’s `materialKey` references a material that was not allocated
 - the plan has no blocks
+- every block is a `break`
+- normalizing durations would make a block shorter than 1 minute
+
+## Content extraction errors
+
+| Error | When |
+| --- | --- |
+| `UnsupportedContentError` | Unknown MIME and no usable filename extension |
+| `ContentExtractionError` | Empty bytes, empty extracted text, or unscannable PDF |
 
 ## What the SDK does not wrap
 

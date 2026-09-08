@@ -4,9 +4,9 @@
 
 # Edu SDK
 
-**Turn any content into interactive learning surfaces.**
+**Turn any content into learning materials.**
 
-The TypeScript SDK for AI-powered learning. Generate quizzes, flashcards, study guides, practice problems, and notes from content—then render them with React.
+The TypeScript SDK for AI-powered learning. Generate quizzes, flashcards, study guides, practice problems, notes, learning sets, and study sessions from content — then render the paired materials with React where a component exists.
 
 ## Packages
 

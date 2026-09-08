@@ -115,7 +115,7 @@ Shared options on every create call:
 | `content` | `string \| FileContent` | Yes |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No |
 
-Some surfaces take extra options (for example `count` on `createQuiz`).
+Some helpers take extra options (for example `count` on `createQuiz`).
 
 ## Errors
 

@@ -1,5 +1,6 @@
 {
   "title": "Guides",
+  "pagesIndex": "index",
   "pages": [
     "error-handling",
     "models-and-providers",

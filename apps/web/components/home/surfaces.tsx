@@ -35,7 +35,7 @@ export function Surfaces() {
           Surfaces
         </h2>
         <p className="text-fd-muted-foreground text-sm sm:text-base">
-          One create call. One React component. Learning UI you can ship.
+          Generate a material, then render it with a matching React component.
         </p>
       </div>
 
