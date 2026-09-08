@@ -7,6 +7,7 @@ const quizQuestionSchema = z
         question: z.string().min(1),
         options: z.array(z.string()).min(2),
         correctAnswer: z.number().int().min(0),
+        topics: z.array(z.string().min(1)).min(1).max(4).optional(),
     })
     .superRefine((question, ctx) => {
         if (question.correctAnswer >= question.options.length) {

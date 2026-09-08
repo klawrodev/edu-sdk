@@ -34,7 +34,8 @@ describe('createStudyGuide', () => {
         keyConcepts: [
             {
                 concept: 'Electrons a negatively charged.',
-                explanation: 'They are minus.'
+                explanation: 'They are minus.',
+                topics: ['Electrons'],
             },
         ],
         reviewQuestions: ['What is electricity?']

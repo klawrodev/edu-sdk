@@ -25,3 +25,11 @@ export const learnerContextSchema = z.object({
 export type PastPerformanceEntry = z.infer<typeof pastPerformanceEntrySchema>;
 export type ExamInsight = z.infer<typeof examInsightSchema>;
 export type LearnerContext = z.infer<typeof learnerContextSchema>;
+
+export const topicsSchema = z
+    .array(z.string().min(1))
+    .min(1)
+    .max(4)
+    .describe(
+        "1–4 short topic labels for this item, grounded in the source content"
+    );
