@@ -29,6 +29,11 @@ export type { Difficulty } from './shared/schema.js';
 
 export type { Artifact, ArtifactMetadata } from './shared/artifact.js';
 
+export type { LearnerContext, PastPerformanceEntry, ExamInsight } from './personalization/schema.js';
+
+export { buildLearnerContext } from './personalization/build-learner-context.js';
+export type { BuildLearnerContextOptions, BuildLearnerContextExamAnalysis, BuildLearnerContextQuizResult } from './personalization/build-learner-context.js';
+
 export { extractContent } from './content/extract-content.js';
 export type { FileContent, ContentInput, ExtractedContent } from './content/types.js';
 
