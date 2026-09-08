@@ -51,4 +51,35 @@ describe("generationOptionsSchema model support", () => {
 
         expect(result.success).toBe(true);
     });
+
+    test("accepts optional learnerContext", () => {
+        const result = generationOptionsSchema.safeParse({
+            model: "openai/gpt-5",
+            content: "Electricity",
+            learnerContext: {
+                focusAreas: ["Ohm's law"],
+                strongAreas: ["Voltage"],
+            },
+        });
+
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.data.learnerContext).toEqual({
+                focusAreas: ["Ohm's law"],
+                strongAreas: ["Voltage"],
+            });
+        }
+    });
+
+    test("rejects invalid learnerContext values", () => {
+        const result = generationOptionsSchema.safeParse({
+            model: "openai/gpt-5",
+            content: "Electricity",
+            learnerContext: {
+                focusAreas: [""],
+            },
+        });
+
+        expect(result.success).toBe(false);
+    });
 });

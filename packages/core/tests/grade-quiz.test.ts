@@ -52,6 +52,17 @@ describe("gradeQuizOptionsSchema", () => {
         });
         expect(result.success).toBe(true);
     });
+
+    test("accepts questions with optional topics", () => {
+        const result = gradeQuizOptionsSchema.safeParse({
+            questions: [
+                { ...questions[0], topics: ["Voltage"] },
+                questions[1],
+            ],
+            answers: [0, 1],
+        });
+        expect(result.success).toBe(true);
+    });
 });
 
 describe("gradeQuiz", () => {
@@ -82,6 +93,7 @@ describe("gradeQuiz", () => {
                 },
             ],
         });
+        expect(result.byTopic).toBeUndefined();
     });
 
     test("scores mixed correct and incorrect answers", () => {
@@ -111,6 +123,77 @@ describe("gradeQuiz", () => {
             isAnswered: false,
         });
         expect(result.results[1]?.isCorrect).toBe(true);
+    });
+
+    test("omits byTopic when no questions have topics", () => {
+        const result = gradeQuiz({
+            questions,
+            answers: [0, 1],
+        });
+
+        expect(result.byTopic).toBeUndefined();
+    });
+
+    test("aggregates byTopic for tagged questions", () => {
+        const result = gradeQuiz({
+            questions: [
+                { ...questions[0], topics: ["Voltage"] },
+                { ...questions[1], topics: ["Current"] },
+            ],
+            answers: [0, 0],
+        });
+
+        expect(result.byTopic).toEqual([
+            { topic: "Voltage", correct: 1, total: 1, percentage: 100 },
+            { topic: "Current", correct: 0, total: 1, percentage: 0 },
+        ]);
+    });
+
+    test("counts multi-topic questions toward each topic", () => {
+        const result = gradeQuiz({
+            questions: [
+                {
+                    ...questions[0],
+                    topics: ["Voltage", "Circuits"],
+                },
+            ],
+            answers: [0],
+        });
+
+        expect(result.byTopic).toEqual([
+            { topic: "Voltage", correct: 1, total: 1, percentage: 100 },
+            { topic: "Circuits", correct: 1, total: 1, percentage: 100 },
+        ]);
+    });
+
+    test("treats unanswered tagged questions as incorrect in byTopic", () => {
+        const result = gradeQuiz({
+            questions: [
+                { ...questions[0], topics: ["Voltage"] },
+                { ...questions[1], topics: ["Current"] },
+            ],
+            answers: [null, 1],
+        });
+
+        expect(result.byTopic).toEqual([
+            { topic: "Voltage", correct: 0, total: 1, percentage: 0 },
+            { topic: "Current", correct: 1, total: 1, percentage: 100 },
+        ]);
+    });
+
+    test("ignores untagged questions when building byTopic", () => {
+        const result = gradeQuiz({
+            questions: [
+                { ...questions[0], topics: ["Voltage"] },
+                questions[1],
+            ],
+            answers: [0, 0],
+        });
+
+        expect(result.score).toBe(1);
+        expect(result.byTopic).toEqual([
+            { topic: "Voltage", correct: 1, total: 1, percentage: 100 },
+        ]);
     });
 
     test("throws InvalidInputError when answers length does not match", () => {

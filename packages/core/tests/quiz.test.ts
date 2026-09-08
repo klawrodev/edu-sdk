@@ -65,7 +65,8 @@ describe('createQuiz', () => {
                 "Electrical current",
                 "Electrical power"
             ],
-            correctAnswer: 0
+            correctAnswer: 0,
+            topics: ["Voltage"],
         },
         {
             question: "What is the unit of current?",
@@ -75,7 +76,8 @@ describe('createQuiz', () => {
                 "Ohm",
                 "Watt"
             ],
-            correctAnswer: 1
+            correctAnswer: 1,
+            topics: ["Current"],
         }
     ];
 

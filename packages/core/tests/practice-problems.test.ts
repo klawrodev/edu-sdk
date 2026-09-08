@@ -40,7 +40,8 @@ describe('createPracticeProblems', () => {
             question: 'A 12 V battery is connected to a 4 Ω resistor. What current flows through it?',
             hint: 'Think about the relationship between voltage, current, and resistance.',
             answer: '3 A',
-            solution: "Using Ohm's law, I = V / R. Therefore, I = 12 / 4 = 3 A."
+            solution: "Using Ohm's law, I = V / R. Therefore, I = 12 / 4 = 3 A.",
+            topics: ["Ohm's law", "Current"],
         }
     ];
 

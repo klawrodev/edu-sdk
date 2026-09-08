@@ -38,11 +38,13 @@ describe('createFlashcards', () => {
     const cards = [
         {
             front: 'What is electricity?',
-            back: 'It is the flow of current.'
+            back: 'It is the flow of current.',
+            topics: ['Electricity'],
         },
         {
             front: 'What is an electron?',
-            back: 'It is a negative charge.'
+            back: 'It is a negative charge.',
+            topics: ['Electrons'],
         }
     ];
 

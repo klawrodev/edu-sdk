@@ -7,6 +7,7 @@ const quizQuestionSchema = z
         question: z.string().min(1),
         options: z.array(z.string()).min(2),
         correctAnswer: z.number().int().min(0),
+        topics: z.array(z.string().min(1)).min(1).max(4).optional(),
     })
     .superRefine((question, ctx) => {
         if (question.correctAnswer >= question.options.length) {
@@ -47,6 +48,7 @@ export const gradeQuizOptionsSchema = z
     });
 
 export type GradeQuizOptions = z.infer<typeof gradeQuizOptionsSchema>;
+export type GradeQuizQuestion = z.infer<typeof quizQuestionSchema>;
 
 const gradeQuizResultItemSchema = z.object({
     questionIndex: z.number().int().min(0),
@@ -56,14 +58,23 @@ const gradeQuizResultItemSchema = z.object({
     isAnswered: z.boolean(),
 });
 
+const gradeQuizTopicResultSchema = z.object({
+    topic: z.string().min(1),
+    correct: z.number().int().min(0),
+    total: z.number().int().positive(),
+    percentage: z.number().int().min(0).max(100),
+});
+
 const gradeQuizResultSchema = z.object({
     score: z.number().int().min(0),
     total: z.number().int().positive(),
     percentage: z.number().int().min(0).max(100),
     results: z.array(gradeQuizResultItemSchema),
+    byTopic: z.array(gradeQuizTopicResultSchema).optional(),
 });
 
 type GradeQuizResultItem = z.infer<typeof gradeQuizResultItemSchema>;
+export type GradeQuizTopicResult = z.infer<typeof gradeQuizTopicResultSchema>;
 export type GradeQuizResult = z.infer<typeof gradeQuizResultSchema>;
 
 export function gradeQuiz(options: GradeQuizOptions): GradeQuizResult {
@@ -93,5 +104,35 @@ export function gradeQuiz(options: GradeQuizOptions): GradeQuizResult {
     const total = questions.length;
     const percentage = Math.round((score / total) * 100);
 
-    return { score, total, percentage, results };
+    const topicStats = new Map<string, { correct: number; total: number }>();
+    questions.forEach((question, index) => {
+        if (!question.topics || question.topics.length === 0) {
+            return;
+        }
+
+        const isCorrect = results[index].isCorrect;
+        for (const topic of question.topics) {
+            const entry = topicStats.get(topic) ?? { correct: 0, total: 0 };
+            entry.total += 1;
+            if (isCorrect) {
+                entry.correct += 1;
+            }
+            topicStats.set(topic, entry);
+        }
+    });
+
+    const byTopic: GradeQuizTopicResult[] = Array.from(topicStats.entries()).map(
+        ([topic, stats]) => ({
+            topic,
+            correct: stats.correct,
+            total: stats.total,
+            percentage: Math.round((stats.correct / stats.total) * 100),
+        })
+    );
+
+    const result: GradeQuizResult = { score, total, percentage, results };
+    if (byTopic.length > 0) {
+        result.byTopic = byTopic;
+    }
+    return result;
 }

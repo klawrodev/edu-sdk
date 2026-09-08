@@ -1,6 +1,6 @@
 'use client'
 
-import { gradeQuiz, type GradeQuizResult, type QuizQuestion } from "edu-sdk";
+import { gradeQuiz, type GradeQuizQuestion, type GradeQuizResult } from "edu-sdk";
 import { useRef, useState } from "react";
 import { cn } from "../utils/index.js";
 
@@ -22,7 +22,7 @@ export type QuizClassNames = {
 };
 
 export type QuizProps = {
-    questions: QuizQuestion[];
+    questions: GradeQuizQuestion[];
     className?: string;
     classNames?: QuizClassNames;
     onComplete?: (result: GradeQuizResult) => void;
