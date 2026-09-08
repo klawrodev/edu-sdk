@@ -2,7 +2,7 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { artifactLabelSchema, wrapArtifact } from "../shared/artifact.js";
 import type { Artifact } from "../shared/artifact.js";
-import { eduGeneratorSystemPrompt, buildGenerationPrompt } from "../shared/prompts.js";
+import { eduGeneratorSystemPrompt, buildGenerationPrompt, personalizationBlock } from "../shared/prompts.js";
 import { InvalidInputError } from "../errors/errors.js";
 import { resolveContent } from "../content/resolve-content.js";
 import { createLearningSet } from "../learning-set/create-learning-set.js";
@@ -55,6 +55,7 @@ export async function createStudySession(
         durationMinutes,
         topic: seedTopic,
         goals: seedGoals,
+        learnerContext,
     } = parsed.data;
     const resolvedContent = await resolveContent(content);
 
@@ -68,6 +69,17 @@ export async function createStudySession(
 
     if (seedGoals && seedGoals.length > 0) {
         extras.push(`Preferred goals:\n${seedGoals.map((goal) => `- ${goal}`).join("\n")}`);
+    } else if (learnerContext?.focusAreas && learnerContext.focusAreas.length > 0) {
+        extras.push(
+            `Preferred goals (derived from learner focus areas):\n${learnerContext.focusAreas
+                .map((area) => `- ${area}`)
+                .join("\n")}`
+        );
+    }
+
+    const personalization = personalizationBlock(learnerContext);
+    if (personalization) {
+        extras.push(personalization);
     }
 
     const { output } = await generateText({
@@ -81,6 +93,8 @@ export async function createStudySession(
                 "Short sessions should use fewer, lighter materials; longer sessions can include more practice and breaks.",
                 "Prefer a sensible sequence: warm-up or read, active practice, break(s) when helpful, then review.",
                 "Use the preferred topic and goals when provided; otherwise derive them from the content.",
+                "When personalization guidance is provided, allocate more time and active practice (quiz, practice problems, flashcards) to weaker or focus topics, and less to strong areas.",
+                "When personalization guidance is provided, prioritize weaker or focus topics in goals, tips, and block instructions while staying grounded in the content.",
                 "Include brief actionable tips and clear per-block instructions.",
                 "Only set materialKey on blocks that use a material you allocated.",
                 "Stay grounded in the provided content and do not invent unsupported facts.",
@@ -111,6 +125,7 @@ export async function createStudySession(
             model,
             content: resolvedContent,
             difficulty,
+            learnerContext,
             include,
         });
         materials = learningSet.content;

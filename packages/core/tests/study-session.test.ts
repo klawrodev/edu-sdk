@@ -268,8 +268,76 @@ describe("createStudySession", () => {
             model: "google/gemini-3.6-flash",
             content: "Electricity",
             difficulty: "medium",
+            learnerContext: undefined,
             include: [{ type: "quiz", count: 5 }],
         });
+    });
+
+    test("includes personalization guidance and passes learnerContext to createLearningSet", async () => {
+        const learnerContext = {
+            focusAreas: ["Ohm's law"],
+            strongAreas: ["Voltage"],
+            pastPerformance: [
+                { topic: "Ohm's law", correct: 1, total: 4 },
+            ],
+        };
+
+        await createStudySession({
+            model: "google/gemini-3.6-flash",
+            content: "Electricity",
+            durationMinutes: 45,
+            learnerContext,
+        });
+
+        expect(mockedGenerateText).toHaveBeenCalledWith(
+            expect.objectContaining({
+                prompt: expect.stringContaining("Personalization guidance"),
+            })
+        );
+        expect(mockedGenerateText).toHaveBeenCalledWith(
+            expect.objectContaining({
+                prompt: expect.stringContaining("Ohm's law"),
+            })
+        );
+        expect(mockedGenerateText).toHaveBeenCalledWith(
+            expect.objectContaining({
+                prompt: expect.stringContaining(
+                    "Preferred goals (derived from learner focus areas)"
+                ),
+            })
+        );
+        expect(mockedCreateLearningSet).toHaveBeenCalledWith({
+            model: "google/gemini-3.6-flash",
+            content: "Electricity",
+            difficulty: "medium",
+            learnerContext,
+            include: [{ type: "quiz", count: 5 }],
+        });
+    });
+
+    test("does not derive goals from focus areas when goals are provided", async () => {
+        await createStudySession({
+            model: "google/gemini-3.6-flash",
+            content: "Electricity",
+            durationMinutes: 45,
+            goals: ["Explain current"],
+            learnerContext: {
+                focusAreas: ["Ohm's law"],
+            },
+        });
+
+        expect(mockedGenerateText).toHaveBeenCalledWith(
+            expect.objectContaining({
+                prompt: expect.stringContaining("Preferred goals:\n- Explain current"),
+            })
+        );
+        expect(mockedGenerateText).not.toHaveBeenCalledWith(
+            expect.objectContaining({
+                prompt: expect.stringContaining(
+                    "Preferred goals (derived from learner focus areas)"
+                ),
+            })
+        );
     });
 
     test("skips createLearningSet when allocation is empty", async () => {
