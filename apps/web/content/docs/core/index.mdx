@@ -3,7 +3,7 @@ title: Core
 description: Generation APIs in the edu-sdk package.
 ---
 
-`edu-sdk` generates learning materials from content. Pass a `model` (string ID or AI SDK `LanguageModel`), `content` (`string` or [`FileContent`](/docs/core/extract-content)), and optional `difficulty` (`easy` | `medium` | `hard`).
+`edu-sdk` generates learning materials from content. Pass a `model` (string ID or AI SDK `LanguageModel`), `content` (`string` or [`FileContent`](/docs/core/extract-content)), optional `difficulty` (`easy` | `medium` | `hard`), and optional [`learnerContext`](/docs/guides/personalization).
 
 Every generator returns an [`Artifact<T>`](/docs/getting-started/concepts) envelope. Invalid options throw [`InvalidInputError`](/docs/guides/error-handling). Unsupported or empty files throw `UnsupportedContentError` / `ContentExtractionError`.
 
@@ -16,6 +16,7 @@ Every generator returns an [`Artifact<T>`](/docs/getting-started/concepts) envel
 | Timed agenda plus materials | [`createStudySession()`](/docs/core/create-study-session) |
 | Text from a file first | [`extractContent()`](/docs/core/extract-content) |
 | Score quiz answers | [`gradeQuiz()`](/docs/core/grade-quiz) / [Assessment](/docs/core/assessment) |
+| Personalize from past work / quiz history | [Personalization](/docs/guides/personalization) (`buildLearnerContext`, `analyzePastWork`) |
 
 ## Content
 
@@ -29,11 +30,11 @@ Pass a file object directly as `content` on any `create*` call, or extract first
 
 | Function | `content` type |
 | --- | --- |
-| [`createFlashcards()`](/docs/core/create-flashcards) | `Flashcard[]` (each with `id`) |
+| [`createFlashcards()`](/docs/core/create-flashcards) | `Flashcard[]` (each with `id`, optional `topics`) |
 | [`createNote()`](/docs/core/create-note) | Markdown `string` |
-| [`createQuiz()`](/docs/core/create-quiz) | `QuizQuestion[]` (each with `id`) |
-| [`createStudyGuide()`](/docs/core/create-study-guide) | `StudyGuideContent` |
-| [`createPracticeProblems()`](/docs/core/create-practice-problems) | `PracticeProblem[]` (each with `id`) |
+| [`createQuiz()`](/docs/core/create-quiz) | `QuizQuestion[]` (each with required `id`, optional `topics`) |
+| [`createStudyGuide()`](/docs/core/create-study-guide) | `StudyGuideContent` (key concepts may include `topics`) |
+| [`createPracticeProblems()`](/docs/core/create-practice-problems) | `PracticeProblem[]` (each with `id`, optional `topics`) |
 
 ## Workflows
 
@@ -46,7 +47,14 @@ Pass a file object directly as `content` on any `create*` call, or extract first
 
 | Function | Role |
 | --- | --- |
-| [`gradeQuiz()`](/docs/core/grade-quiz) | Deterministic scoring (no model call) |
+| [`gradeQuiz()`](/docs/core/grade-quiz) | Deterministic scoring; optional `byTopic` when questions have `topics` |
 | [Assessment](/docs/core/assessment) | `createQuizAttempt()` / `completeQuizAttempt()` for attempt lifecycle |
 
-See [Quick Start](/docs/getting-started/quick-start) for a full `createQuiz` example, and [Concepts](/docs/getting-started/concepts) for the shared contract.
+## Personalization
+
+| API | Role |
+| --- | --- |
+| `buildLearnerContext()` | Pure merge of focus / exam / quiz signals → `LearnerContext` |
+| `analyzePastWork()` | LLM diagnostic of past exams/homework → `Artifact<PastWorkAnalysis>` |
+
+See the [Personalization](/docs/guides/personalization) guide for the closed loop. See [Quick Start](/docs/getting-started/quick-start) for a full `createQuiz` example, and [Concepts](/docs/getting-started/concepts) for the shared contract.

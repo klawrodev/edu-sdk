@@ -1,0 +1,137 @@
+---
+title: Personalization
+description: Make generation learner-aware with learnerContext, past work analysis, and topic-aware grading.
+---
+
+Edu SDK stays **stateless**: no learner database. Your app owns persistence. The SDK owns contracts and helpers that turn performance signals into better generation.
+
+Personalization is **additive**. Pass optional `learnerContext` on any `create*` helper (including learning sets and study sessions). Generation remains grounded in `content`.
+
+## The loop
+
+1. **Signals** — explicit focus areas, past exams/homework, and/or quiz history
+2. **`analyzePastWork`** — LLM diagnostic of past work → `PastWorkAnalysis`
+3. **`gradeQuiz` / `completeQuizAttempt`** — optional `byTopic` when questions have `topics`
+4. **`buildLearnerContext`** — merge signals into `LearnerContext`
+5. **Pass `learnerContext`** into `create*` / `createLearningSet` / `createStudySession`
+6. **Generated materials** carry `topics` (where applicable) so the next grade feeds the loop again
+
+## `LearnerContext`
+
+```ts
+type LearnerContext = {
+  focusAreas?: string[];
+  strongAreas?: string[];
+  pastPerformance?: Array<{
+    topic: string;
+    correct: number;
+    total: number;
+    lastAttemptAt?: string;
+  }>;
+  examInsights?: Array<{
+    sourceLabel?: string;
+    weakTopics: string[];
+    missedConcepts?: string[];
+    notes?: string;
+  }>;
+  priorities?: string[];
+};
+```
+
+All fields are optional. Pass only what you have.
+
+## Topic tags
+
+Generated quizzes, flashcards, practice problems, and study-guide key concepts get **1–4** short `topics` tags.
+
+On public TypeScript types, `topics` is **optional** so hand-authored materials can omit them. Generation requires topics; grading/`byTopic` only runs when topics are present.
+
+`QuizQuestion` always requires an `id` (SDK-stamped on generate). Notes can take `learnerContext` but do **not** get topic tags on the body.
+
+## `analyzePastWork`
+
+```ts
+import { analyzePastWork } from "edu-sdk";
+
+const analysis = await analyzePastWork({
+  model: "google/gemini-3.6-flash",
+  content: pastExamText, // or FileContent, or an array of sources
+  sourceLabel: "Fall midterm",
+});
+
+// analysis is Artifact<PastWorkAnalysis>
+analysis.content.weakTopics;
+analysis.content.suggestedFocusAreas;
+```
+
+`PastWorkAnalysis` includes required `weakTopics`, plus optional `strongTopics`, `missedConcepts`, `suggestedFocusAreas`, `notes`, and `sourceLabel` (from options when provided).
+
+## `gradeQuiz` and `byTopic`
+
+When questions include `topics`, [`gradeQuiz()`](/docs/core/grade-quiz) (and assessment completion) may return `byTopic`:
+
+```ts
+{
+  topic: string;
+  correct: number;
+  total: number;
+  percentage: number;
+}
+```
+
+If no questions have topics, `byTopic` is omitted.
+
+## `buildLearnerContext`
+
+Pure merge helper — no model call.
+
+```ts
+import {
+  analyzePastWork,
+  buildLearnerContext,
+  createStudySession,
+  gradeQuiz,
+} from "edu-sdk";
+
+const analysis = await analyzePastWork({
+  model,
+  content: pastExam,
+  sourceLabel: "Fall midterm",
+});
+
+const grade = gradeQuiz({ questions: quiz.content, answers });
+
+const learnerContext = buildLearnerContext({
+  focusAreas: ["Series circuits"],
+  examAnalysis: analysis.content,
+  quizResults: [{ result: grade, attemptedAt: new Date().toISOString() }],
+});
+
+const session = await createStudySession({
+  model,
+  content: chapterText,
+  durationMinutes: 45,
+  learnerContext,
+});
+```
+
+`examAnalysis` accepts the fields from `PastWorkAnalysis` (or an array of analyses). Quiz results contribute only via `result.byTopic`.
+
+## Study sessions
+
+With `learnerContext`, [`createStudySession()`](/docs/core/create-study-session):
+
+- Seeds goals from `focusAreas` when you do not pass `goals`
+- Biases the plan toward weaker/focus topics
+- Forwards context into material generation
+
+## What React does today
+
+[`<Quiz />`](/docs/react/quiz) and [`<StudySession />`](/docs/react/study-session) accept the same data shapes (`QuizQuestion` with optional `topics`, `GradeQuizResult` with optional `byTopic`). They do **not** render topics or `byTopic` yet — use `onComplete` / your own UI if you need to display them.
+
+## Related
+
+- [Concepts](/docs/getting-started/concepts) — shared options including `learnerContext`
+- [`createStudySession()`](/docs/core/create-study-session) — session-level bias
+- [`gradeQuiz()`](/docs/core/grade-quiz) — `byTopic` scoring
+- [Study session flow](/docs/guides/study-session-flow) — running a session in React

@@ -24,8 +24,11 @@ const studyGuide = await createStudyGuide({
 | `model` | `string \| LanguageModel` | Yes | — |
 | `content` | `string \| FileContent` | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
+| `learnerContext` | `LearnerContext` | No | — |
 
 `content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
+
+`learnerContext` is optional personalization input. See [Personalization](/docs/guides/personalization).
 
 ## Returns
 
@@ -46,11 +49,14 @@ const studyGuide = await createStudyGuide({
     keyConcepts: {
       concept: string;
       explanation: string;
+      topics?: string[];
     }[];
     reviewQuestions: string[];
   };
 }
 ```
+
+Generation produces **1–4** `topics` on each key concept. On the public content type, `topics` is optional so hand-authored guides can omit them.
 
 ## Example
 

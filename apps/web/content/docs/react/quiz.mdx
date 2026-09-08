@@ -35,6 +35,8 @@ type QuizProps = {
 
 `onComplete` runs once after the last question is submitted. Every question must be answered — there is no skip path.
 
+Each question must include a required `id`. Generated questions may include optional `topics`; `GradeQuizResult` may include `byTopic`. This component does not display topics or `byTopic` yet — read them from `onComplete` if you need them. See [Personalization](/docs/guides/personalization).
+
 ## classNames
 
 | Key | Part |

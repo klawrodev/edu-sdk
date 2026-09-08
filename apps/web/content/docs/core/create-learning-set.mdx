@@ -3,7 +3,7 @@ title: createLearningSet
 description: Generate any mix of learning artifacts from the same content in one call.
 ---
 
-Runs the generators you list in `include` in parallel from shared `model`, `content`, and `difficulty`. Supported types: [`createQuiz()`](/docs/core/create-quiz), [`createFlashcards()`](/docs/core/create-flashcards), [`createPracticeProblems()`](/docs/core/create-practice-problems), [`createNote()`](/docs/core/create-note), and [`createStudyGuide()`](/docs/core/create-study-guide).
+Runs the generators you list in `include` in parallel from shared `model`, `content`, `difficulty`, and optional `learnerContext`. Supported types: [`createQuiz()`](/docs/core/create-quiz), [`createFlashcards()`](/docs/core/create-flashcards), [`createPracticeProblems()`](/docs/core/create-practice-problems), [`createNote()`](/docs/core/create-note), and [`createStudyGuide()`](/docs/core/create-study-guide).
 
 ## Usage
 
@@ -31,9 +31,12 @@ const set = await createLearningSet({
 | `model` | `string \| LanguageModel` | Yes | — |
 | `content` | `string \| FileContent` | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
+| `learnerContext` | `LearnerContext` | No | — |
 | `include` | array of include items (min 1) | Yes | — |
 
 `content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes). File content is extracted once before nested generators run.
+
+When `learnerContext` is set, it is forwarded to every nested `create*` call. See [Personalization](/docs/guides/personalization).
 
 ### `include` items
 

@@ -7,6 +7,8 @@ Renders a timed agenda from [`createStudySession()`](/docs/core/create-study-ses
 
 Generation stays in `edu-sdk`. This component does **not** call `createStudySession`. Persistence of progress is also app-owned — use `onBlockComplete` / `onSessionComplete` if you need hooks.
 
+Generated materials may include optional `topics`; quiz grades may include `byTopic`. This runner does not display those fields yet. Pass `learnerContext` at generation time — see [Personalization](/docs/guides/personalization).
+
 ## Usage
 
 ```tsx

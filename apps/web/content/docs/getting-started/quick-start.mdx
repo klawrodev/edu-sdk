@@ -22,10 +22,11 @@ const quiz = await createQuiz({
 
 ```ts
 {
-  id: string;
+  id: string;              // required (SDK-stamped on generate)
   question: string;
   options: string[];
-  correctAnswer: number; // zero-indexed
+  correctAnswer: number;   // zero-indexed
+  topics?: string[];       // 1–4 tags when generated; optional for hand-authored
 }
 ```
 
@@ -45,10 +46,11 @@ import "@edu-sdk/react/styles.css";
 />
 ```
 
-Import `styles.css` once in your app, not on every page. `onComplete` is optional — it receives the [`GradeQuizResult`](/docs/core/grade-quiz) after the learner finishes.
+Import `styles.css` once in your app, not on every page. `onComplete` is optional — it receives the [`GradeQuizResult`](/docs/core/grade-quiz) after the learner finishes (including optional `byTopic` when questions have `topics`).
 
 ## Next steps
 
 - [Concepts](/docs/getting-started/concepts) — shared `Artifact` shape and React prop rules
+- [Personalization](/docs/guides/personalization) — `learnerContext`, past work, and topic-aware grading
 - [Core](/docs/core) — all generators, workflows, and assessment
 - [React](/docs/react) — components and styling

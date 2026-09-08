@@ -28,8 +28,11 @@ const quiz = await createQuiz({
 | `count` | `number` (positive int) | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
 | `numOfOptions` | `number` (min 2) | No | `4` |
+| `learnerContext` | `LearnerContext` | No | — |
 
 `content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
+
+`learnerContext` is optional personalization input. See [Personalization](/docs/guides/personalization).
 
 ## Returns
 
@@ -49,7 +52,7 @@ const quiz = await createQuiz({
 }
 ```
 
-Each question in `content` contains:
+Each question in `content` is a `QuizQuestion`:
 
 ```ts
 {
@@ -57,10 +60,13 @@ Each question in `content` contains:
   question: string;
   options: string[];
   correctAnswer: number;
+  topics?: string[];
 }
 ```
 
 `correctAnswer` is zero-indexed. Artifact `id` / leaf `id`s and `metadata` are SDK-generated; `title` and optional `description` come from the model.
+
+Generation always produces **1–4** `topics` tags per question. On the public `QuizQuestion` type, `topics` is optional so hand-authored quizzes (and grading) can omit them. `id` is always required.
 
 ## Example
 

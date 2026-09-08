@@ -16,7 +16,7 @@ Edu SDK is two packages that work together: generate learning materials with `ed
     UI components for quizzes, flashcards, study guides, and practice problems.
   </Card>
   <Card title="Guides" href="/docs/guides">
-    Models, files, study sessions, and error handling.
+    Models, files, study sessions, personalization, and error handling.
   </Card>
 </Cards>
 
@@ -37,7 +37,8 @@ Edu SDK is two packages that work together: generate learning materials with `ed
 | [`extractContent()`](/docs/core/extract-content) | Extract text from PDF / text / markdown bytes |
 | [`createLearningSet()`](/docs/core/create-learning-set) | Several material types from one call |
 | [`createStudySession()`](/docs/core/create-study-session) | Timed agenda plus matching materials |
-| [`gradeQuiz()`](/docs/core/grade-quiz) | Score submitted quiz answers |
+| [`gradeQuiz()`](/docs/core/grade-quiz) | Score submitted quiz answers (optional `byTopic`) |
 | [Assessment](/docs/core/assessment) | `createQuizAttempt()` / `completeQuizAttempt()` lifecycle |
+| `buildLearnerContext()` / `analyzePastWork()` | Personalization helpers — see [Personalization](/docs/guides/personalization) |
 
 Start with [Installation](/docs/getting-started/installation), then [Quick Start](/docs/getting-started/quick-start). For the shared `Artifact` shape and React prop rules, see [Concepts](/docs/getting-started/concepts).
