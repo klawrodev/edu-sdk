@@ -4,6 +4,7 @@ import { InvalidInputError } from "../src/errors/errors";
 
 const questions = [
     {
+        id: "question-1",
         question: "What is voltage?",
         options: [
             "Electrical potential difference",
@@ -12,11 +13,14 @@ const questions = [
             "Electrical power",
         ],
         correctAnswer: 0,
+        topics: ["Voltage"],
     },
     {
+        id: "question-2",
         question: "What is the unit of current?",
         options: ["Volt", "Ampere", "Ohm", "Watt"],
         correctAnswer: 1,
+        topics: ["Current"],
     },
 ];
 
@@ -84,6 +88,10 @@ describe("completeQuizAttempt", () => {
                     isAnswered: true,
                 },
             ],
+            byTopic: [
+                { topic: "Voltage", correct: 1, total: 1, percentage: 100 },
+                { topic: "Current", correct: 1, total: 1, percentage: 100 },
+            ],
         });
     });
 
@@ -103,6 +111,21 @@ describe("completeQuizAttempt", () => {
             isCorrect: false,
             isAnswered: false,
         });
+    });
+
+    test("passes through byTopic from gradeQuiz when questions are tagged", () => {
+        const attempt = createQuizAttempt({ id: "attempt-5" });
+
+        const { result } = completeQuizAttempt({
+            attempt,
+            questions,
+            answers: [0, 0],
+        });
+
+        expect(result.byTopic).toEqual([
+            { topic: "Voltage", correct: 1, total: 1, percentage: 100 },
+            { topic: "Current", correct: 0, total: 1, percentage: 0 },
+        ]);
     });
 
     test("throws InvalidInputError when answers length does not match", () => {
