@@ -5,6 +5,7 @@ import {
   StudyGuide,
   StudySession,
 } from "@edu-sdk/react";
+import { PersonalizationDemo } from "./personalization-demo";
 
 const flashcards = [
   {
@@ -194,6 +195,8 @@ export default function Page() {
         <h2>Study Session</h2>
         <StudySession session={session} />
       </section>
+
+      <PersonalizationDemo />
     </main>
   );
 }
