@@ -75,9 +75,9 @@ export async function createLearningSet(options: CreateLearningSetOptions): Prom
         );
     }
 
-    const { model, content, difficulty = "medium", include } = parsed.data;
+    const { model, content, difficulty = "medium", include, learnerContext } = parsed.data;
     const resolvedContent = await resolveContent(content);
-    const shared = { model, content: resolvedContent, difficulty };
+    const shared = { model, content: resolvedContent, difficulty, learnerContext };
 
     const entries = await Promise.all(
         include.map(async (item) => {

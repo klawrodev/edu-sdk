@@ -217,10 +217,16 @@ describe("createLearningSet", () => {
     });
 
     test("passes shared and nested options through to each helper", async () => {
+        const learnerContext = {
+            focusAreas: ["Ohm's law"],
+            strongAreas: ["Voltage"],
+        };
+
         await createLearningSet({
             model: "google/gemini-3.6-flash",
             content: "Electricity",
             difficulty: "hard",
+            learnerContext,
             include: [
                 { type: "quiz", count: 5, numOfOptions: 3 },
                 { type: "flashcards", count: 8 },
@@ -234,6 +240,7 @@ describe("createLearningSet", () => {
             model: "google/gemini-3.6-flash",
             content: "Electricity",
             difficulty: "hard",
+            learnerContext,
             count: 5,
             numOfOptions: 3,
         });
@@ -241,24 +248,45 @@ describe("createLearningSet", () => {
             model: "google/gemini-3.6-flash",
             content: "Electricity",
             difficulty: "hard",
+            learnerContext,
             count: 8,
         });
         expect(mockedCreatePracticeProblems).toHaveBeenCalledWith({
             model: "google/gemini-3.6-flash",
             content: "Electricity",
             difficulty: "hard",
+            learnerContext,
             count: 4,
         });
         expect(mockedCreateNote).toHaveBeenCalledWith({
             model: "google/gemini-3.6-flash",
             content: "Electricity",
             difficulty: "hard",
+            learnerContext,
             length: "long",
         });
         expect(mockedCreateStudyGuide).toHaveBeenCalledWith({
             model: "google/gemini-3.6-flash",
             content: "Electricity",
             difficulty: "hard",
+            learnerContext,
+        });
+    });
+
+    test("omits learnerContext on nested helpers when not provided", async () => {
+        await createLearningSet({
+            model: "google/gemini-3.6-flash",
+            content: "Electricity",
+            include: [{ type: "quiz", count: 2 }],
+        });
+
+        expect(mockedCreateQuiz).toHaveBeenCalledWith({
+            model: "google/gemini-3.6-flash",
+            content: "Electricity",
+            difficulty: "medium",
+            learnerContext: undefined,
+            count: 2,
+            numOfOptions: undefined,
         });
     });
 
