@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { LanguageModel } from "ai";
+import { learnerContextSchema } from "../personalization/schema.js";
 
 const difficultySchema = z.enum(['easy', 'medium', 'hard']);
 
@@ -33,5 +34,6 @@ export const generationOptionsSchema = z.object({
         languageModelSchema
     ]),
     content: contentInputSchema,
-    difficulty: difficultySchema.optional()
+    difficulty: difficultySchema.optional(),
+    learnerContext: learnerContextSchema.optional(),
 });

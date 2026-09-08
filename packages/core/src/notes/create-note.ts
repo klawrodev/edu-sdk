@@ -3,7 +3,7 @@ import { z } from "zod";
 import { generationOptionsSchema } from "../shared/schema.js";
 import { artifactLabelSchema, wrapArtifact } from "../shared/artifact.js";
 import type { Artifact } from "../shared/artifact.js";
-import { eduGeneratorSystemPrompt, buildGenerationPrompt } from "../shared/prompts.js";
+import { eduGeneratorSystemPrompt, buildGenerationPrompt, personalizationBlock } from "../shared/prompts.js";
 import { InvalidInputError } from "../errors/errors.js";
 import { resolveContent } from "../content/resolve-content.js";
 
@@ -31,8 +31,13 @@ export async function createNote(options: CreateNoteOptions): Promise<Note> {
         throw new InvalidInputError(result.error.issues[0]?.message ?? "Invalid note generation options");
     }
 
-    const { model, content, difficulty = 'medium', length = 'medium' } = result.data;
+    const { model, content, difficulty = 'medium', length = 'medium', learnerContext } = result.data;
     const resolvedContent = await resolveContent(content);
+    const extras: string[] = [];
+    const personalization = personalizationBlock(learnerContext);
+    if (personalization) {
+        extras.push(personalization);
+    }
 
     const { output } = await generateText({
         model,
@@ -44,11 +49,13 @@ export async function createNote(options: CreateNoteOptions): Promise<Note> {
                 'Use headings to organize sections and bold important terms and concepts.',
                 lengthGuidance[length],
                 'Use depth and vocabulary appropriate to the requested difficulty.',
+                'When personalization guidance is provided, prioritize weaker or focus topics while staying grounded in the content.',
                 'Stay grounded in the provided content and do not introduce unsupported information.',
                 'Match the requested difficulty level.',
                 'Provide a concise title and optional short description for the note as a whole.'
             ],
             difficulty,
+            extras,
             content: resolvedContent
         }),
         output: Output.object({
