@@ -22,6 +22,9 @@ export type { StudyGuideContent, CreateStudyGuideOptions } from './studyguide/cr
 export { createPracticeProblems } from './practice-problems/create-practice-problems.js';
 export type { PracticeProblem, CreatePracticeProblemsOptions } from './practice-problems/create-practice-problems.js';
 
+export { createStudySession } from './study-session/create-study-session.js';
+export type { StudySessionContent, StudySessionBlock, CreateStudySessionOptions } from './study-session/create-study-session.js';
+
 export type { Difficulty } from './shared/schema.js';
 
 export type { Artifact, ArtifactMetadata } from './shared/artifact.js';

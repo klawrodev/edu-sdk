@@ -15,7 +15,7 @@ import type { PracticeProblems } from "../practice-problems/create-practice-prob
 import { createStudyGuide } from "../studyguide/create-studyguide.js";
 import type { StudyGuide } from "../studyguide/create-studyguide.js";
 
-const includeItemSchema = z.discriminatedUnion("type", [
+const learningSetIncludeItemSchema = z.discriminatedUnion("type", [
     z.object({
         type: z.literal("quiz"),
         count: z.number().int().positive(),
@@ -38,9 +38,11 @@ const includeItemSchema = z.discriminatedUnion("type", [
     }),
 ]);
 
+export type LearningSetIncludeItem = z.infer<typeof learningSetIncludeItemSchema>;
+
 export const createLearningSetOptionsSchema = generationOptionsSchema
     .extend({
-        include: z.array(includeItemSchema).min(1),
+        include: z.array(learningSetIncludeItemSchema).min(1),
     })
     .superRefine((data, ctx) => {
         const types = data.include.map((item) => item.type);

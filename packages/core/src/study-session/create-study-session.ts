@@ -5,15 +5,17 @@ import type { Artifact } from "../shared/artifact.js";
 import { eduGeneratorSystemPrompt, buildGenerationPrompt } from "../shared/prompts.js";
 import { InvalidInputError } from "../errors/errors.js";
 import { resolveContent } from "../content/resolve-content.js";
+import { createLearningSet } from "../learning-set/create-learning-set.js";
+import type { LearningSetContent } from "../learning-set/create-learning-set.js";
 import {
-    assertMaterialKeysMatchAllocation, createStudySessionOptionsSchema,
-    normalizeBlockDurations, studySessionBlockPlanSchema,
-    studySessionMaterialAllocationSchema, type CreateStudySessionOptions,
-    type StudySessionContent,
+    allocationToInclude, assertMaterialKeysMatchAllocation,
+    createStudySessionOptionsSchema, normalizeBlockDurations,
+    studySessionBlockPlanSchema, studySessionMaterialAllocationSchema,
+    type CreateStudySessionOptions, type StudySessionContent,
 } from "./schema.js";
 
 export { createStudySessionOptionsSchema } from "./schema.js";
-export type { CreateStudySessionOptions, StudySessionContent } from "./schema.js";
+export type { CreateStudySessionOptions, StudySessionBlock, StudySessionContent } from "./schema.js";
 
 const studySessionPlanOutputSchema = artifactLabelSchema.extend({
     topic: z.string().min(1).describe("The main topic of this study session"),
@@ -101,6 +103,19 @@ export async function createStudySession(
         id: crypto.randomUUID(),
     }));
 
+    const include = allocationToInclude(output.allocation);
+    let materials: LearningSetContent = {};
+
+    if (include.length > 0) {
+        const learningSet = await createLearningSet({
+            model,
+            content: resolvedContent,
+            difficulty,
+            include,
+        });
+        materials = learningSet.content;
+    }
+
     return wrapArtifact({
         title: output.title,
         description: output.description,
@@ -110,7 +125,7 @@ export async function createStudySession(
             totalDurationMinutes: durationMinutes,
             tips: output.tips,
             blocks,
-            materials: {},
+            materials,
         },
         model,
         difficulty,

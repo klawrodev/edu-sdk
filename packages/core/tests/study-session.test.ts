@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { generateText } from "ai";
 import { createStudySession, createStudySessionOptionsSchema } from "../src/study-session/create-study-session";
-import { assertMaterialKeysMatchAllocation, normalizeBlockDurations } from "../src/study-session/schema";
+import { allocationToInclude, assertMaterialKeysMatchAllocation, normalizeBlockDurations } from "../src/study-session/schema";
+import { createLearningSet } from "../src/learning-set/create-learning-set";
 import { eduGeneratorSystemPrompt } from "../src/shared/prompts";
 import { InvalidInputError } from "../src/errors/errors";
 
@@ -13,7 +14,36 @@ vi.mock(import("ai"), async (importOriginal) => {
     };
 });
 
+vi.mock(import("../src/learning-set/create-learning-set"), async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        createLearningSet: vi.fn(),
+    };
+});
+
 const mockedGenerateText = vi.mocked(generateText);
+const mockedCreateLearningSet = vi.mocked(createLearningSet);
+
+const learningSetMaterials = {
+    quiz: {
+        id: "quiz-1",
+        title: "Electricity Quiz",
+        metadata: {
+            createdAt: "2026-01-01T00:00:00.000Z",
+            model: "google/gemini-3.6-flash",
+            difficulty: "medium" as const,
+        },
+        content: [
+            {
+                id: "q1",
+                question: "What is voltage?",
+                options: ["Electrical potential difference", "Resistance", "Current", "Power"],
+                correctAnswer: 0,
+            },
+        ],
+    },
+};
 
 describe("createStudySessionOptionsSchema", () => {
     test("accepts valid options", () => {
@@ -103,6 +133,30 @@ describe("normalizeBlockDurations", () => {
     });
 });
 
+describe("allocationToInclude", () => {
+    test("maps a full allocation to learning-set include items", () => {
+        expect(
+            allocationToInclude({
+                quiz: { count: 5, numOfOptions: 4 },
+                flashcards: { count: 10 },
+                practiceProblems: { count: 3 },
+                notes: { length: "short" },
+                studyGuide: true,
+            })
+        ).toEqual([
+            { type: "quiz", count: 5, numOfOptions: 4 },
+            { type: "flashcards", count: 10 },
+            { type: "practiceProblems", count: 3 },
+            { type: "notes", length: "short" },
+            { type: "studyGuide" },
+        ]);
+    });
+
+    test("returns an empty include list for an empty allocation", () => {
+        expect(allocationToInclude({})).toEqual([]);
+    });
+});
+
 describe("assertMaterialKeysMatchAllocation", () => {
     test("allows materialKeys that were allocated", () => {
         expect(() =>
@@ -160,12 +214,23 @@ describe("createStudySession", () => {
 
     beforeEach(() => {
         mockedGenerateText.mockReset();
+        mockedCreateLearningSet.mockReset();
         mockedGenerateText.mockResolvedValue({
             output: plan,
         } as any);
+        mockedCreateLearningSet.mockResolvedValue({
+            id: "learning-set-1",
+            title: "Electricity Learning Set",
+            metadata: {
+                createdAt: "2026-01-01T00:00:00.000Z",
+                model: "google/gemini-3.6-flash",
+                difficulty: "medium",
+            },
+            content: learningSetMaterials,
+        } as any);
     });
 
-    test("returns an artifact with study session content and empty materials", async () => {
+    test("returns an artifact with study session content and learning-set materials", async () => {
         const result = await createStudySession({
             model: "google/gemini-3.6-flash",
             content: "Electricity",
@@ -178,7 +243,7 @@ describe("createStudySession", () => {
         expect(result.content.goals).toEqual(plan.goals);
         expect(result.content.tips).toEqual(plan.tips);
         expect(result.content.totalDurationMinutes).toBe(45);
-        expect(result.content.materials).toEqual({});
+        expect(result.content.materials).toEqual(learningSetMaterials);
         expect(result.content.blocks).toEqual([
             {
                 ...plan.blocks[0],
@@ -199,6 +264,38 @@ describe("createStudySession", () => {
             difficulty: "medium",
         });
         expect(result.id).toEqual(expect.any(String));
+        expect(mockedCreateLearningSet).toHaveBeenCalledWith({
+            model: "google/gemini-3.6-flash",
+            content: "Electricity",
+            difficulty: "medium",
+            include: [{ type: "quiz", count: 5 }],
+        });
+    });
+
+    test("skips createLearningSet when allocation is empty", async () => {
+        mockedGenerateText.mockResolvedValue({
+            output: {
+                ...plan,
+                blocks: [
+                    {
+                        type: "read",
+                        title: "Read notes",
+                        durationMinutes: 45,
+                        instructions: "Skim the key ideas",
+                    },
+                ],
+                allocation: {},
+            },
+        } as any);
+
+        const result = await createStudySession({
+            model: "google/gemini-3.6-flash",
+            content: "Electricity",
+            durationMinutes: 45,
+        });
+
+        expect(result.content.materials).toEqual({});
+        expect(mockedCreateLearningSet).not.toHaveBeenCalled();
     });
 
     test("normalizes block durations within tolerance", async () => {

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { generationOptionsSchema } from "../shared/schema.js";
 import { InvalidInputError } from "../errors/errors.js";
-import type { LearningSetContent } from "../learning-set/create-learning-set.js";
+import type { LearningSetContent, LearningSetIncludeItem } from "../learning-set/create-learning-set.js";
 
 export const createStudySessionOptionsSchema = generationOptionsSchema.extend({
     durationMinutes: z
@@ -140,6 +140,47 @@ export function normalizeBlockDurations<T extends { type: StudySessionBlockType;
     return blocks.map((block, index) =>
         index === adjustIndex ? { ...block, durationMinutes: adjustedDuration } : block
     );
+}
+
+export function allocationToInclude(allocation: StudySessionMaterialAllocation): LearningSetIncludeItem[] {
+    const include: LearningSetIncludeItem[] = [];
+
+    if (allocation.quiz) {
+        include.push({
+            type: "quiz",
+            count: allocation.quiz.count,
+            ...(allocation.quiz.numOfOptions !== undefined
+                ? { numOfOptions: allocation.quiz.numOfOptions }
+                : {}),
+        });
+    }
+
+    if (allocation.flashcards) {
+        include.push({
+            type: "flashcards",
+            count: allocation.flashcards.count,
+        });
+    }
+
+    if (allocation.practiceProblems) {
+        include.push({
+            type: "practiceProblems",
+            count: allocation.practiceProblems.count,
+        });
+    }
+
+    if (allocation.notes) {
+        include.push({
+            type: "notes",
+            ...(allocation.notes.length !== undefined ? { length: allocation.notes.length } : {}),
+        });
+    }
+
+    if (allocation.studyGuide) {
+        include.push({ type: "studyGuide" });
+    }
+
+    return include;
 }
 
 export function assertMaterialKeysMatchAllocation(
