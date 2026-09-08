@@ -48,6 +48,7 @@ export const gradeQuizOptionsSchema = z
     });
 
 export type GradeQuizOptions = z.infer<typeof gradeQuizOptionsSchema>;
+export type GradeQuizQuestion = z.infer<typeof quizQuestionSchema>;
 
 const gradeQuizResultItemSchema = z.object({
     questionIndex: z.number().int().min(0),
