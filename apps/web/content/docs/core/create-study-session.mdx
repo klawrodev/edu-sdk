@@ -29,11 +29,27 @@ const session = await createStudySession({
 | `durationMinutes` | `number` (integer, 5–240) | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
 | `topic` | `string` | No | Derived from content |
-| `goals` | `string[]` | No | Derived from content |
+| `goals` | `string[]` | No | See goal seeding below |
+| `learnerContext` | `LearnerContext` | No | — |
 
 `content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
 
-When `topic` or `goals` are provided, they seed the plan; otherwise the model derives them from the content.
+### Goal seeding
+
+1. If you pass `goals`, those seed the plan.
+2. Else if `learnerContext.focusAreas` is set, those seed preferred goals.
+3. Otherwise the model derives goals from the content.
+
+When `topic` is provided, it seeds the plan topic; otherwise the model derives it from the content.
+
+### Personalization
+
+When `learnerContext` is set:
+
+- The plan biases **time and active practice** (quiz, practice problems, flashcards) toward weaker or focus topics, and less toward strong areas.
+- The same `learnerContext` is forwarded into [`createLearningSet()`](/docs/core/create-learning-set) so generated materials are personalized too.
+
+See [Personalization](/docs/guides/personalization).
 
 ## Returns
 
@@ -94,7 +110,7 @@ Block durations are normalized to match `durationMinutes`. Gaps within ±5 minut
 
 ### Materials
 
-`materials` is a [`LearningSetContent`](/docs/core/create-learning-set) object (nested full artifacts). The model decides which types to include and in what quantity based on duration, difficulty, and content. If nothing is allocated, `materials` is `{}`.
+`materials` is a [`LearningSetContent`](/docs/core/create-learning-set) object (nested full artifacts). The model decides which types to include and in what quantity based on duration, difficulty, content, and optional `learnerContext`. If nothing is allocated, `materials` is `{}`.
 
 ## Example
 

@@ -70,6 +70,8 @@ const { attempt: completed, result } = completeQuizAttempt({
 | `questions` | `QuizQuestion[]` | Yes |
 | `answers` | `(number \| null)[]` | Yes |
 
+Questions must include a required `id` on each item (same contract as [`gradeQuiz()`](/docs/core/grade-quiz)).
+
 ### Returns
 
 ```ts
@@ -79,6 +81,8 @@ const { attempt: completed, result } = completeQuizAttempt({
 }
 ```
 
+`AssessmentResult` is an alias of `GradeQuizResult`, including optional `byTopic` when questions carry `topics`.
+
 Invalid input throws `InvalidInputError`.
 
-See also [`gradeQuiz()`](/docs/core/grade-quiz) for scoring without attempt records.
+See also [`gradeQuiz()`](/docs/core/grade-quiz) for scoring without attempt records, and [Personalization](/docs/guides/personalization) for using `byTopic` in `buildLearnerContext`.

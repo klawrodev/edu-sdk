@@ -26,8 +26,11 @@ const flashcards = await createFlashcards({
 | `content` | `string \| FileContent` | Yes | — |
 | `count` | `number` (positive int) | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
+| `learnerContext` | `LearnerContext` | No | — |
 
 `content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
+
+`learnerContext` is optional personalization input. See [Personalization](/docs/guides/personalization).
 
 ## Returns
 
@@ -54,8 +57,11 @@ Each flashcard in `content` contains:
   id: string;
   front: string;
   back: string;
+  topics?: string[];
 }
 ```
+
+Generation produces **1–4** `topics` per card. On the public `Flashcard` type, `topics` is optional so hand-authored decks can omit them. `id` is always present on generated cards.
 
 ## Example
 

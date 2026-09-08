@@ -31,6 +31,8 @@ const result = gradeQuiz({
 
 `answers` must be the same length as `questions`. Each entry is a zero-indexed option, or `null` for unanswered.
 
+Each `QuizQuestion` needs a required `id`. Optional `topics` on questions enable a per-topic breakdown in the result.
+
 ## Returns
 
 `GradeQuizResult`
@@ -47,10 +49,20 @@ const result = gradeQuiz({
     isCorrect: boolean;
     isAnswered: boolean;
   }>;
+  byTopic?: Array<{
+    topic: string;
+    correct: number;
+    total: number;
+    percentage: number;
+  }>;
 }
 ```
 
 `percentage` is `0`–`100`, rounded to the nearest integer. Unanswered questions count as incorrect (`isCorrect: false`, `isAnswered: false`).
+
+`byTopic` is included only when at least one question has `topics`. A question tagged with multiple topics counts toward each of those topics. When no questions have topics, `byTopic` is omitted (not an empty array).
+
+`GradeQuizTopicResult` is the type of each `byTopic` entry.
 
 ## Example
 
@@ -63,8 +75,11 @@ const result = gradeQuiz({
 });
 
 console.log(`${result.score} / ${result.total} (${result.percentage}%)`);
+if (result.byTopic) {
+  console.log(result.byTopic);
+}
 ```
 
 Invalid input throws `InvalidInputError`.
 
-For attempt lifecycle (`id`, `startedAt`, `completedAt`), see [Assessment](/docs/core/assessment).
+For attempt lifecycle (`id`, `startedAt`, `completedAt`), see [Assessment](/docs/core/assessment). For feeding `byTopic` into the next generation, see [Personalization](/docs/guides/personalization).

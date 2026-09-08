@@ -5,7 +5,8 @@
     "error-handling",
     "models-and-providers",
     "working-with-files",
-    "study-session-flow"
+    "study-session-flow",
+    "personalization"
   ],
   "defaultOpen": true
 }

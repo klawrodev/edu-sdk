@@ -26,8 +26,11 @@ const problems = await createPracticeProblems({
 | `content` | `string \| FileContent` | Yes | — |
 | `count` | `number` (positive int) | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
+| `learnerContext` | `LearnerContext` | No | — |
 
 `content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
+
+`learnerContext` is optional personalization input. See [Personalization](/docs/guides/personalization).
 
 ## Returns
 
@@ -56,8 +59,11 @@ Each problem in `content` contains:
   hint: string;
   answer: string;
   solution: string;
+  topics?: string[];
 }
 ```
+
+Generation produces **1–4** `topics` per problem. On the public `PracticeProblem` type, `topics` is optional so hand-authored sets can omit them.
 
 ## Example
 

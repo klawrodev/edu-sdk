@@ -26,8 +26,11 @@ const note = await createNote({
 | `content` | `string \| FileContent` | Yes | — |
 | `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
 | `length` | `"short" \| "medium" \| "long"` | No | `"medium"` |
+| `learnerContext` | `LearnerContext` | No | — |
 
 `content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
+
+`learnerContext` is optional personalization input (biases what the note emphasizes). Notes do **not** carry topic tags on the body — only structured materials like quizzes and flashcards do. See [Personalization](/docs/guides/personalization).
 
 ## Returns
 
