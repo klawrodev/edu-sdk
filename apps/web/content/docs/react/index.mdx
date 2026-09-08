@@ -13,19 +13,20 @@ description: UI components in the @edu-sdk/react package.
 | [`<Quiz />`](/docs/react/quiz) | [`createQuiz()`](/docs/core/create-quiz) | `questions: QuizQuestion[]` (use `artifact.content`) |
 | [`<StudyGuide />`](/docs/react/study-guide) | [`createStudyGuide()`](/docs/core/create-study-guide) | **Full** `Artifact<StudyGuideContent>` |
 | [`<PracticeProblems />`](/docs/react/practice-problems) | [`createPracticeProblems()`](/docs/core/create-practice-problems) | `problems: PracticeProblem[]` (use `artifact.content`) |
+| [`<StudySession />`](/docs/react/study-session) | [`createStudySession()`](/docs/core/create-study-session) | `session: StudySessionContent` (use `artifact.content`) |
 
 ```tsx
 <Quiz questions={quiz.content} />
 <StudyGuide studyGuide={studyGuide} />
+<StudySession session={session.content} />
 ```
 
 ## No component for
 
 | Core API | How to render |
 | --- | --- |
-| [`createNote()`](/docs/core/create-note) | Render Markdown yourself (`artifact.content` is a string) |
+| [`createNote()`](/docs/core/create-note) | Render Markdown yourself (`artifact.content` is a string), or via `renderNotes` inside [`<StudySession />`](/docs/react/study-session) |
 | [`createLearningSet()`](/docs/core/create-learning-set) | Compose the material components from nested artifacts |
-| [`createStudySession()`](/docs/core/create-study-session) | Build a runner over `blocks` + `materials` — see [Study session flow](/docs/guides/study-session-flow) |
 
 `<Quiz />` grades with [`gradeQuiz()`](/docs/core/grade-quiz) internally. It does **not** use [`createQuizAttempt` / `completeQuizAttempt`](/docs/core/assessment) — those are for app-owned persistence.
 

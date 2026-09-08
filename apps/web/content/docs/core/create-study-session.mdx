@@ -5,7 +5,7 @@ description: Generate a timed study session plan and matching materials from con
 
 Builds a timed study agenda from your content for a given `durationMinutes`.
 
-**Two phases:** (1) the model plans topic, goals, tips, block sequence, and a material allocation; (2) materials are generated via [`createLearningSet()`](/docs/core/create-learning-set) from that allocation. There is no React session runner — compose UI from `blocks` and `materials` (see [Study session flow](/docs/guides/study-session-flow)).
+**Two phases:** (1) the model plans topic, goals, tips, block sequence, and a material allocation; (2) materials are generated via [`createLearningSet()`](/docs/core/create-learning-set) from that allocation. Render with [`<StudySession />`](/docs/react/study-session), or compose your own UI from `blocks` and `materials` (see [Study session flow](/docs/guides/study-session-flow)).
 
 ## Usage
 
@@ -117,4 +117,4 @@ const quiz = materials.quiz; // Artifact<QuizQuestion[]> | undefined
 
 Invalid input throws `InvalidInputError` (for example `durationMinutes` outside 5–240, empty content, or plan/allocation mismatches).
 
-Next: [Study session flow](/docs/guides/study-session-flow) for wiring blocks to React components.
+Next: [`<StudySession />`](/docs/react/study-session) or [Study session flow](/docs/guides/study-session-flow) for wiring blocks to React.

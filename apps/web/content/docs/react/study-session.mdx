@@ -1,0 +1,99 @@
+---
+title: Study session
+description: Run a timed study session from createStudySession.
+---
+
+Renders a timed agenda from [`createStudySession()`](/docs/core/create-study-session). Pass `session.content` (`StudySessionContent`). The component walks `blocks`, shows a per-block countdown, and mounts the matching material UI from `materials` (`Quiz`, `Flashcards`, `StudyGuide`, `PracticeProblems`, or notes).
+
+Generation stays in `edu-sdk`. This component does **not** call `createStudySession`. Persistence of progress is also app-owned — use `onBlockComplete` / `onSessionComplete` if you need hooks.
+
+## Usage
+
+```tsx
+import { createStudySession } from "edu-sdk";
+import { StudySession } from "@edu-sdk/react";
+import "@edu-sdk/react/styles.css";
+
+const session = await createStudySession({
+  model: "google/gemini-3.6-flash",
+  content,
+  durationMinutes: 45,
+  difficulty: "medium",
+});
+
+<StudySession
+  session={session.content}
+  onBlockComplete={(block, index) => {
+    // Optional: persist progress
+  }}
+  onSessionComplete={() => {
+    // Optional: mark the session finished
+  }}
+/>
+```
+
+## Props
+
+```ts
+type StudySessionProps = {
+  session: StudySessionContent;
+  className?: string;
+  classNames?: StudySessionClassNames;
+  allowSkip?: boolean; // default true
+  autoAdvance?: boolean; // default false
+  renderNotes?: (markdown: string) => ReactNode;
+  onBlockComplete?: (block: StudySessionBlock, index: number) => void;
+  onSessionComplete?: () => void;
+};
+```
+
+- **`allowSkip`** — when `true` (default), a Skip control advances without waiting for the timer.
+- **`autoAdvance`** — when `true`, moving to the next block (or finishing) happens when the block timer hits zero. Default is `false`.
+- **`renderNotes`** — optional Markdown renderer for `materials.notes`. Without it, notes render as plain preformatted text.
+- **`onBlockComplete`** — fires once per block when the learner leaves it (Next / Skip / Finish) or when the timer expires.
+- **`onSessionComplete`** — fires once when the last block is finished (or auto-advanced through).
+
+Empty `blocks` renders nothing.
+
+## classNames
+
+| Key | Part |
+| --- | --- |
+| `root` | Root container |
+| `header` | Topic / goals / tips header |
+| `topic` | Session topic |
+| `goals` | Goals list |
+| `goal` | Each goal item |
+| `tips` | Tips list |
+| `tip` | Each tip item |
+| `progress` | Block index row |
+| `timer` | Countdown |
+| `blockTitle` | Current block title |
+| `blockType` | Current block type |
+| `instructions` | Fallback instructions |
+| `body` | Material / instructions body |
+| `notes` | Notes wrapper |
+| `controls` | Button row |
+| `previousButton` | Previous button |
+| `nextButton` | Next / Finish button |
+| `skipButton` | Skip button |
+
+## Example
+
+```tsx
+<StudySession
+  session={session.content}
+  allowSkip
+  className="my-session"
+  classNames={{
+    topic: "my-topic",
+    timer: "my-timer",
+  }}
+  renderNotes={(markdown) => <Markdown>{markdown}</Markdown>}
+  onSessionComplete={() => {
+    // App-owned persistence
+  }}
+/>
+```
+
+For a custom runner instead of this component, see [Study session flow](/docs/guides/study-session-flow). See [Styling](/docs/react/styling) for `styles.css` and CSS variables.
