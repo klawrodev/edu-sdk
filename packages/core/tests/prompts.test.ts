@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import {
     buildGenerationPrompt, buildUserPrompt, contentBlock,
-    difficultyGuidance, eduGeneratorSystemPrompt
+    difficultyGuidance, eduGeneratorSystemPrompt, personalizationBlock
 } from '../src/shared/prompts';
 
 describe('eduGeneratorSystemPrompt', () => {
@@ -60,5 +60,83 @@ describe('buildGenerationPrompt', () => {
 
         expect(prompt).toContain('Create notes.');
         expect(prompt).toContain(contentBlock('Photosynthesis'));
+    });
+});
+
+describe('personalizationBlock', () => {
+    test('returns undefined when learnerContext is missing', () => {
+        expect(personalizationBlock()).toBeUndefined();
+        expect(personalizationBlock(undefined)).toBeUndefined();
+    });
+
+    test('returns undefined when all fields are empty', () => {
+        expect(personalizationBlock({})).toBeUndefined();
+        expect(
+            personalizationBlock({
+                focusAreas: [],
+                strongAreas: [],
+                pastPerformance: [],
+                examInsights: [],
+                priorities: [],
+            })
+        ).toBeUndefined();
+    });
+
+    test('includes focus areas, strong areas, and priorities', () => {
+        const block = personalizationBlock({
+            focusAreas: ['Ohm\'s law'],
+            strongAreas: ['Voltage'],
+            priorities: ['Prepare for midterm'],
+        });
+
+        expect(block).toContain('Personalization guidance');
+        expect(block).toContain('Focus areas');
+        expect(block).toContain('- Ohm\'s law');
+        expect(block).toContain('Strong areas');
+        expect(block).toContain('- Voltage');
+        expect(block).toContain('Learner priorities');
+        expect(block).toContain('- Prepare for midterm');
+    });
+
+    test('formats past performance with percentage and optional timestamp', () => {
+        const block = personalizationBlock({
+            pastPerformance: [
+                {
+                    topic: 'Current',
+                    correct: 1,
+                    total: 4,
+                    lastAttemptAt: '2026-01-01T00:00:00.000Z',
+                },
+            ],
+        });
+
+        expect(block).toContain('Past performance by topic');
+        expect(block).toContain(
+            '- Current: 1/4 (25%) (last: 2026-01-01T00:00:00.000Z)'
+        );
+    });
+
+    test('formats exam insights with sourceLabel fallback', () => {
+        const block = personalizationBlock({
+            examInsights: [
+                {
+                    sourceLabel: 'Fall midterm',
+                    weakTopics: ['Resistance'],
+                    missedConcepts: ['Series circuits'],
+                    notes: 'Ran out of time',
+                },
+                {
+                    weakTopics: ['Power'],
+                },
+            ],
+        });
+
+        expect(block).toContain('Exam insights');
+        expect(block).toContain('Fall midterm:');
+        expect(block).toContain('Weak topics: Resistance');
+        expect(block).toContain('Missed concepts: Series circuits');
+        expect(block).toContain('Notes: Ran out of time');
+        expect(block).toContain('Exam insight 2:');
+        expect(block).toContain('Weak topics: Power');
     });
 });
