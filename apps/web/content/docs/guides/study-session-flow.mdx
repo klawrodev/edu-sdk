@@ -1,9 +1,9 @@
 ---
 title: Study session flow
-description: Turn createStudySession output into a timed UI with React material components.
+description: Turn createStudySession output into a timed UI with React.
 ---
 
-[`createStudySession()`](/docs/core/create-study-session) returns a timed agenda plus nested learning materials. There is no `<StudySession />` component — your app owns the runner; the SDK owns planning and generation.
+[`createStudySession()`](/docs/core/create-study-session) returns a timed agenda plus nested learning materials. Use [`<StudySession />`](/docs/react/study-session) for the default runner, or build your own from `blocks` and `materials`.
 
 ## What you get
 
@@ -25,9 +25,20 @@ const { topic, goals, tips, blocks, materials } = session.content;
 
 Under the hood the SDK plans the session, then generates materials with `createLearningSet`.
 
-## Walk the agenda
+## Default: `<StudySession />`
 
-Each block may point at a material via `materialKey`:
+```tsx
+import { StudySession } from "@edu-sdk/react";
+import "@edu-sdk/react/styles.css";
+
+<StudySession session={session.content} />
+```
+
+The component owns block progress, a per-block countdown, Skip / Next / Finish, and mounts the matching material components. See [`<StudySession />`](/docs/react/study-session) for props (`allowSkip`, `autoAdvance`, `renderNotes`, callbacks).
+
+## Custom runner
+
+If you need different UX, walk `blocks` yourself and compose materials:
 
 ```ts
 for (const block of blocks) {
@@ -47,8 +58,6 @@ for (const block of blocks) {
 ```
 
 `materialKey` is only set when that material was allocated. Blocks like `break` or `read` usually have none.
-
-## Wire React components
 
 ```tsx
 import { Quiz, Flashcards, StudyGuide, PracticeProblems } from "@edu-sdk/react";
@@ -86,9 +95,8 @@ Remember: list UIs take `.content`; [`StudyGuide`](/docs/react/study-guide) take
 
 ## What your app still owns
 
-- Timers and progress through `blocks`
-- Persistence of session state
-- Rendering notes Markdown
-- Whether learners can skip blocks or revisit materials
+- Persistence of session state (even with `<StudySession />`, use the callbacks)
+- A Markdown renderer for notes if you want more than plain text (`renderNotes` or your own UI)
+- Any UX beyond the default runner (custom timers, forced revisit rules, etc.)
 
 See also [Concepts](/docs/getting-started/concepts) and [`createStudySession`](/docs/core/create-study-session).
