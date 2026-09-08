@@ -18,11 +18,11 @@ export function Hero() {
       <div className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 pt-16 pb-12 text-center sm:pt-20 sm:pb-16">
         <div className="home-animate-in flex flex-col items-center gap-5">
           <h1 className="font-display max-w-3xl text-4xl leading-[1.15] font-semibold tracking-tight text-balance sm:text-5xl md:text-[3.25rem]">
-            Turn any content into interactive learning surfaces
+            Turn any content into interactive learning materials
           </h1>
 
           <p className="text-fd-muted-foreground max-w-xl text-base text-pretty sm:text-lg">
-            The TypeScript SDK for AI-powered learning.
+            The TypeScript SDK for AI-powered learning experiences.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-1">

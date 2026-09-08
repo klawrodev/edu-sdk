@@ -1,0 +1,101 @@
+---
+title: Concepts
+description: Shared types and patterns across edu-sdk and @edu-sdk/react.
+---
+
+Every generator in `edu-sdk` shares the same options shape and return envelope. React components consume that data with a few consistent rules.
+
+## Shared options
+
+Every `create*` helper accepts:
+
+| Option | Type | Required | Default |
+| --- | --- | --- | --- |
+| `model` | `string \| LanguageModel` | Yes | — |
+| `content` | `string \| FileContent` | Yes | — |
+| `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
+
+`model` is an AI SDK model ID or a `LanguageModel` instance. See [Models & providers](/docs/guides/models-and-providers).
+
+`content` is either a non-empty string or a [`FileContent`](/docs/core/extract-content) object (PDF / text / markdown bytes). See [Working with files](/docs/guides/working-with-files).
+
+Some helpers add extra options (`count`, `length`, `durationMinutes`, `include`, and so on). Those are documented on each API page.
+
+## Artifact
+
+Every generator returns `Promise<Artifact<T>>`:
+
+```ts
+{
+  id: string;
+  title: string;
+  description?: string;
+  metadata: {
+    createdAt: string; // ISO timestamp
+    model: string;     // resolved model label
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: T;
+}
+```
+
+`T` depends on the helper:
+
+| Helper | `content` type |
+| --- | --- |
+| `createFlashcards` | `Flashcard[]` |
+| `createNote` | Markdown `string` |
+| `createQuiz` | `QuizQuestion[]` |
+| `createStudyGuide` | `StudyGuideContent` |
+| `createPracticeProblems` | `PracticeProblem[]` |
+| `createLearningSet` | Nested artifacts (`LearningSetContent`) |
+| `createStudySession` | Agenda + nested materials (`StudySessionContent`) |
+
+`extractContent` is not a generator — it returns extracted text, not an `Artifact`.
+
+## Choosing a generator
+
+| Goal | Use |
+| --- | --- |
+| One material type | A single `create*` helper |
+| Several materials from the same content | [`createLearningSet()`](/docs/core/create-learning-set) |
+| Timed agenda plus materials | [`createStudySession()`](/docs/core/create-study-session) |
+
+## React prop shapes
+
+Most components take the **inner** `artifact.content` array:
+
+```tsx
+<Quiz questions={quiz.content} />
+<Flashcards flashcards={flashcards.content} />
+<PracticeProblems problems={problems.content} />
+```
+
+[`<StudyGuide />`](/docs/react/study-guide) is the exception — it takes the **full** artifact so it can render `title` and sections:
+
+```tsx
+<StudyGuide studyGuide={studyGuide} />
+```
+
+There is no React component for notes, learning sets, or study sessions. Build your own layout, or compose the material components from nested artifacts. See [Study session flow](/docs/guides/study-session-flow).
+
+## Nested artifacts
+
+[`createLearningSet()`](/docs/core/create-learning-set) and [`createStudySession()`](/docs/core/create-study-session) nest full artifacts under `content`:
+
+```ts
+const set = await createLearningSet({ /* ... */ });
+
+// Outer envelope
+set.title;
+set.content.quiz; // Artifact<QuizQuestion[]> | undefined
+
+// Pass into React
+<Quiz questions={set.content.quiz!.content} />
+```
+
+## Errors
+
+Invalid options throw `InvalidInputError`. File problems throw `UnsupportedContentError` or `ContentExtractionError`. All extend `EduSDKError`. Model and network failures come from the AI SDK and are not wrapped. See [Error handling](/docs/guides/error-handling).
+
+Next: [Core](/docs/core) for the full API, or [Quick Start](/docs/getting-started/quick-start) for a minimal example.

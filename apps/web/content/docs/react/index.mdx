@@ -5,19 +5,36 @@ description: UI components in the @edu-sdk/react package.
 
 `@edu-sdk/react` renders data produced by `edu-sdk`.
 
-| Component | Data |
+## Components
+
+| Component | Data from | Prop shape |
+| --- | --- | --- |
+| [`<Flashcards />`](/docs/react/flashcards) | [`createFlashcards()`](/docs/core/create-flashcards) | `flashcards: Flashcard[]` (use `artifact.content`) |
+| [`<Quiz />`](/docs/react/quiz) | [`createQuiz()`](/docs/core/create-quiz) | `questions: QuizQuestion[]` (use `artifact.content`) |
+| [`<StudyGuide />`](/docs/react/study-guide) | [`createStudyGuide()`](/docs/core/create-study-guide) | **Full** `Artifact<StudyGuideContent>` |
+| [`<PracticeProblems />`](/docs/react/practice-problems) | [`createPracticeProblems()`](/docs/core/create-practice-problems) | `problems: PracticeProblem[]` (use `artifact.content`) |
+
+```tsx
+<Quiz questions={quiz.content} />
+<StudyGuide studyGuide={studyGuide} />
+```
+
+## No component for
+
+| Core API | How to render |
 | --- | --- |
-| [`<Flashcards />`](/docs/react/flashcards) | [`createFlashcards()`](/docs/core/create-flashcards) |
-| [`<Quiz />`](/docs/react/quiz) | [`createQuiz()`](/docs/core/create-quiz) |
-| [`<StudyGuide />`](/docs/react/study-guide) | [`createStudyGuide()`](/docs/core/create-study-guide) |
-| [`<PracticeProblems />`](/docs/react/practice-problems) | [`createPracticeProblems()`](/docs/core/create-practice-problems) |
+| [`createNote()`](/docs/core/create-note) | Render Markdown yourself (`artifact.content` is a string) |
+| [`createLearningSet()`](/docs/core/create-learning-set) | Compose the material components from nested artifacts |
+| [`createStudySession()`](/docs/core/create-study-session) | Build a runner over `blocks` + `materials` — see [Study session flow](/docs/guides/study-session-flow) |
 
-There is no component for [`createNote()`](/docs/core/create-note).
+`<Quiz />` grades with [`gradeQuiz()`](/docs/core/grade-quiz) internally. It does **not** use [`createQuizAttempt` / `completeQuizAttempt`](/docs/core/assessment) — those are for app-owned persistence.
 
-Styling has three levels. See [Styling](/docs/react/styling):
+## Styling
+
+Three levels. See [Styling](/docs/react/styling):
 
 1. Import `@edu-sdk/react/styles.css` for the defaults.
 2. Pass `className` / `classNames` to override parts of a component.
 3. Set CSS variables (for example `--edu-quiz-background`) to theme the defaults.
 
-See [Quick Start](/docs/getting-started/quick-start) for `<Quiz />`.
+See [Quick Start](/docs/getting-started/quick-start) for `<Quiz />`, and [Concepts](/docs/getting-started/concepts) for prop-shape rules.

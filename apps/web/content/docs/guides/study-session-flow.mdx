@@ -1,0 +1,94 @@
+---
+title: Study session flow
+description: Turn createStudySession output into a timed UI with React material components.
+---
+
+[`createStudySession()`](/docs/core/create-study-session) returns a timed agenda plus nested learning materials. There is no `<StudySession />` component — your app owns the runner; the SDK owns planning and generation.
+
+## What you get
+
+```ts
+import { createStudySession } from "edu-sdk";
+
+const session = await createStudySession({
+  model: "google/gemini-3.6-flash",
+  content,
+  durationMinutes: 45,
+  difficulty: "medium",
+});
+
+const { topic, goals, tips, blocks, materials } = session.content;
+```
+
+- **`blocks`** — ordered agenda items (`read`, `flashcards`, `quiz`, `break`, …) with durations and instructions.
+- **`materials`** — a [`LearningSetContent`](/docs/core/create-learning-set) object: nested full artifacts keyed by type (`quiz`, `flashcards`, …). May be `{}` if nothing was allocated.
+
+Under the hood the SDK plans the session, then generates materials with `createLearningSet`.
+
+## Walk the agenda
+
+Each block may point at a material via `materialKey`:
+
+```ts
+for (const block of blocks) {
+  console.log(block.title, block.durationMinutes, block.instructions);
+
+  if (block.materialKey === "quiz" && materials.quiz) {
+    // materials.quiz is Artifact<QuizQuestion[]>
+    renderQuiz(materials.quiz.content);
+  }
+
+  if (block.materialKey === "flashcards" && materials.flashcards) {
+    renderFlashcards(materials.flashcards.content);
+  }
+
+  // break / read / review often have no materialKey
+}
+```
+
+`materialKey` is only set when that material was allocated. Blocks like `break` or `read` usually have none.
+
+## Wire React components
+
+```tsx
+import { Quiz, Flashcards, StudyGuide, PracticeProblems } from "@edu-sdk/react";
+import "@edu-sdk/react/styles.css";
+
+function SessionBlock({ block, materials }) {
+  switch (block.materialKey) {
+    case "quiz":
+      return materials.quiz ? (
+        <Quiz questions={materials.quiz.content} />
+      ) : null;
+    case "flashcards":
+      return materials.flashcards ? (
+        <Flashcards flashcards={materials.flashcards.content} />
+      ) : null;
+    case "practiceProblems":
+      return materials.practiceProblems ? (
+        <PracticeProblems problems={materials.practiceProblems.content} />
+      ) : null;
+    case "studyGuide":
+      return materials.studyGuide ? (
+        <StudyGuide studyGuide={materials.studyGuide} />
+      ) : null;
+    case "notes":
+      return materials.notes ? (
+        <article>{/* render Markdown: materials.notes.content */}</article>
+      ) : null;
+    default:
+      return <p>{block.instructions}</p>;
+  }
+}
+```
+
+Remember: list UIs take `.content`; [`StudyGuide`](/docs/react/study-guide) takes the full nested artifact.
+
+## What your app still owns
+
+- Timers and progress through `blocks`
+- Persistence of session state
+- Rendering notes Markdown
+- Whether learners can skip blocks or revisit materials
+
+See also [Concepts](/docs/getting-started/concepts) and [`createStudySession`](/docs/core/create-study-session).

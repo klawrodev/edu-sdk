@@ -7,6 +7,7 @@ Renders a multiple-choice quiz from [`createQuiz()`](/docs/core/create-quiz).
 
 When every question has been answered and submitted, the quiz is graded with [`gradeQuiz()`](/docs/core/grade-quiz) and the final score is shown. Pass `onComplete` to receive that result in your app.
 
+This component does **not** use [`createQuizAttempt` / `completeQuizAttempt`](/docs/core/assessment). Call those yourself when you need attempt records for persistence.
 ## Usage
 
 ```tsx

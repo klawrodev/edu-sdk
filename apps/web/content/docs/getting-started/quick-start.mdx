@@ -14,7 +14,7 @@ const quiz = await createQuiz({
   model: "google/gemini-3.6-flash",
   content,
   count: 10,
-  difficulty: "medium"
+  difficulty: "medium",
 });
 ```
 
@@ -29,15 +29,26 @@ const quiz = await createQuiz({
 }
 ```
 
+Configure your AI SDK provider so the `model` value resolves. See [Models & providers](/docs/guides/models-and-providers).
+
 ## Render
 
 ```tsx
 import { Quiz } from "@edu-sdk/react";
 import "@edu-sdk/react/styles.css";
 
-<Quiz questions={quiz.content} />
+<Quiz
+  questions={quiz.content}
+  onComplete={(result) => {
+    console.log(result.score, result.percentage);
+  }}
+/>
 ```
 
-Import `styles.css` once in your app, not on every page.
+Import `styles.css` once in your app, not on every page. `onComplete` is optional — it receives the [`GradeQuizResult`](/docs/core/grade-quiz) after the learner finishes.
 
-See [Core](/docs/core) and [React](/docs/react) for the rest of the APIs.
+## Next steps
+
+- [Concepts](/docs/getting-started/concepts) — shared `Artifact` shape and React prop rules
+- [Core](/docs/core) — all generators, workflows, and assessment
+- [React](/docs/react) — components and styling

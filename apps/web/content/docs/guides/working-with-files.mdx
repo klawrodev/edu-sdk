@@ -1,0 +1,102 @@
+---
+title: Working with files
+description: Pass PDF, text, or markdown bytes into generators or extract them first.
+---
+
+`content` on every generator accepts a string **or** a `FileContent` object. The SDK extracts text from supported files; it does not host uploads or storage.
+
+## FileContent
+
+```ts
+type FileContent = {
+  type: "file";
+  data: Uint8Array | ArrayBuffer;
+  mimeType: string;
+  filename?: string;
+};
+```
+
+Node `Buffer` works for `data` (it is a `Uint8Array`). Use `filename` as a fallback when `mimeType` is generic (for example `application/octet-stream`).
+
+## Two patterns
+
+**Pass the file straight into a generator** — extraction happens inside the call:
+
+```ts
+import { createQuiz } from "edu-sdk";
+import { readFile } from "node:fs/promises";
+
+const data = await readFile("./lecture.pdf");
+
+const quiz = await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content: {
+    type: "file",
+    data,
+    mimeType: "application/pdf",
+    filename: "lecture.pdf",
+  },
+  count: 10,
+});
+```
+
+**Extract first** — inspect, cache, or trim text before generating:
+
+```ts
+import { extractContent, createQuiz } from "edu-sdk";
+
+const { text, pageCount } = await extractContent({
+  type: "file",
+  data,
+  mimeType: "application/pdf",
+  filename: "lecture.pdf",
+});
+
+const quiz = await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content: text,
+  count: 10,
+});
+```
+
+[`createLearningSet()`](/docs/core/create-learning-set) extracts a file once, then reuses the text for every nested generator.
+
+## Supported types (v1)
+
+| MIME | Filename fallback |
+| --- | --- |
+| `application/pdf` | `.pdf` |
+| `text/plain` | `.txt` |
+| `text/markdown` | `.md`, `.markdown` |
+
+Text-based PDFs only. Scanned or image-only PDFs without OCR are not supported — extraction throws if no text is found.
+
+## From an upload
+
+Your app still owns the upload surface:
+
+```ts
+const file = formData.get("file") as File;
+const data = new Uint8Array(await file.arrayBuffer());
+
+await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content: {
+    type: "file",
+    data,
+    mimeType: file.type || "application/octet-stream",
+    filename: file.name,
+  },
+  count: 10,
+});
+```
+
+## Errors
+
+| Error | When |
+| --- | --- |
+| `UnsupportedContentError` | Unknown MIME and no usable filename extension |
+| `ContentExtractionError` | Empty bytes, empty extracted text, or PDF parse failure |
+| `InvalidInputError` | Malformed `FileContent` or empty string content |
+
+All extend `EduSDKError`. Full details: [`extractContent`](/docs/core/extract-content) and [Error handling](/docs/guides/error-handling).

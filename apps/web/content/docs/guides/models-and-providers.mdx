@@ -1,0 +1,48 @@
+---
+title: Models & providers
+description: How to pass a model to edu-sdk with the AI SDK.
+---
+
+Every generator takes a `model` option. The SDK forwards it to the [AI SDK](https://ai-sdk.dev) `generateText` call — it does not ship a private model registry.
+
+## What `model` accepts
+
+| Value | When to use |
+| --- | --- |
+| `string` | A model ID your AI SDK setup can resolve (for example a gateway ID) |
+| `LanguageModel` | A provider instance from `@ai-sdk/openai`, `@ai-sdk/anthropic`, `@ai-sdk/google`, and so on |
+
+```ts
+import { createQuiz } from "edu-sdk";
+import { openai } from "@ai-sdk/openai";
+
+// String ID (requires a configured AI SDK gateway / default provider)
+const quiz = await createQuiz({
+  model: "google/gemini-3.6-flash",
+  content,
+  count: 10,
+});
+
+// Explicit provider instance
+const quizWithProvider = await createQuiz({
+  model: openai("gpt-4.1-mini"),
+  content,
+  count: 10,
+});
+```
+
+Install and configure whichever AI SDK provider packages your app needs. `edu-sdk` depends on `ai` and uses it for generation; your app still owns API keys and provider wiring.
+
+## Environment
+
+Typical setups use an API key in the environment (for example `OPENAI_API_KEY`, `AI_GATEWAY_API_KEY`, or your provider’s equivalent). Follow the provider’s AI SDK docs for the exact variable names and client setup.
+
+Generation runs on the server (or any Node-capable runtime). Do not call generators from the browser with a secret key.
+
+## What the SDK does not wrap
+
+Validation and file extraction errors throw `EduSDKError` subclasses. **Model, network, rate-limit, and generation failures** come from the AI SDK and are **not** wrapped. Catch those separately from `InvalidInputError`. See [Error handling](/docs/guides/error-handling).
+
+## Artifact metadata
+
+The returned `Artifact.metadata.model` is a string label: the ID you passed, or `model.modelId` from a `LanguageModel`, or `"language-model"` as a fallback.
