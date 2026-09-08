@@ -9,3 +9,6 @@ export { StudyGuide } from './studyguide/studyguide.js';
 
 export type { PracticeProblemsProps, PracticeProblemsClassNames } from './practice-problems/practice-problem.js';
 export { PracticeProblems } from './practice-problems/practice-problem.js';
+
+export type { StudySessionProps, StudySessionClassNames } from './study-session/study-session.js';
+export { StudySession } from './study-session/study-session.js';
