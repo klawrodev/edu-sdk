@@ -13,16 +13,21 @@ export const createPracticeProblemsOptionsSchema = generationOptionsSchema.exten
 });
 export type CreatePracticeProblemsOptions = z.infer<typeof createPracticeProblemsOptionsSchema>;
 
-const practiceProblemSchema = z.object({
+const practiceProblemBaseSchema = z.object({
     question: z.string().min(1).describe('A clear, unambiguous practice problem question'),
     hint: z.string().min(1).describe('A helpful hint that guides without revealing the answer'),
     answer: z.string().min(1).describe('A concise final answer'),
     solution: z.string().min(1).describe('A clear worked solution explaining how to reach the answer step by step'),
+});
+
+const practiceProblemGenerationSchema = practiceProblemBaseSchema.extend({
     topics: topicsSchema,
 });
 
-type PracticeProblemFields = z.infer<typeof practiceProblemSchema>;
-export type PracticeProblem = PracticeProblemFields & { id: string };
+export type PracticeProblem = z.infer<typeof practiceProblemBaseSchema> & {
+    id: string;
+    topics?: string[];
+};
 export type PracticeProblems = Artifact<PracticeProblem[]>;
 
 export async function createPracticeProblems(options: CreatePracticeProblemsOptions): Promise<PracticeProblems> {
@@ -73,7 +78,7 @@ export async function createPracticeProblems(options: CreatePracticeProblemsOpti
         }),
         output: Output.object({
             schema: artifactLabelSchema.extend({
-                problems: z.array(practiceProblemSchema).length(count)
+                problems: z.array(practiceProblemGenerationSchema).length(count)
             })
         })
     });

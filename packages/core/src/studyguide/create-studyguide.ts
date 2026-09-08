@@ -12,27 +12,32 @@ import { topicsSchema } from '../personalization/schema.js';
 export const createStudyGuideOptionsSchema = generationOptionsSchema;
 export type CreateStudyGuideOptions = z.infer<typeof createStudyGuideOptionsSchema>;
 
-const studyGuideOutputSchema = artifactLabelSchema.extend({
+const studyGuideKeyConceptBaseSchema = z.object({
+    concept: z.string().min(1).describe('The name of an important concept'),
+    explanation: z.string().min(1).describe('A clear, accurate explanation of the concept'),
+});
+
+const studyGuideContentSchema = z.object({
     summary: z.string().min(1).describe('A concise but complete summary of the material'),
     keyConcepts: z.array(
-        z.object({
-            concept: z.string().min(1).describe('The name of an important concept'),
-            explanation: z.string().min(1).describe('A clear, accurate explanation of the concept'),
+        studyGuideKeyConceptBaseSchema.extend({
+            topics: topicsSchema.optional(),
+        })
+    ).min(1).describe('The most important concepts a student should understand'),
+    reviewQuestions: z.array(z.string().min(1)).min(1).describe('Review questions that test understanding rather than simple memorization'),
+});
+
+export type StudyGuideContent = z.infer<typeof studyGuideContentSchema>;
+
+const studyGuideOutputSchema = artifactLabelSchema.extend({
+    summary: studyGuideContentSchema.shape.summary,
+    keyConcepts: z.array(
+        studyGuideKeyConceptBaseSchema.extend({
             topics: topicsSchema,
         })
     ).min(1).describe('The most important concepts a student should understand'),
-    reviewQuestions: z.array(z.string().min(1)).min(1).describe('Review questions that test understanding rather than simple memorization')
+    reviewQuestions: studyGuideContentSchema.shape.reviewQuestions,
 });
-
-export type StudyGuideContent = {
-    summary: string;
-    keyConcepts: {
-        concept: string;
-        explanation: string;
-        topics: string[];
-    }[];
-    reviewQuestions: string[];
-};
 
 export type StudyGuide = Artifact<StudyGuideContent>;
 

@@ -15,17 +15,24 @@ export const createQuizOptionsSchema = generationOptionsSchema.extend({
 
 export type CreateQuizOptions = z.infer<typeof createQuizOptionsSchema>;
 
-function createQuizQuestionSchema(numOfOptions: number) {
-    return z.object({
-        question: z.string().describe('A clear quiz question grounded in the provided content'),
+const quizQuestionBaseSchema = z.object({
+    question: z.string().describe('A clear quiz question grounded in the provided content'),
+    options: z.array(z.string()).min(2).describe('Answer choices for this question'),
+    correctAnswer: z.number().int().min(0).describe('The 0-based index of the single correct option'),
+});
+
+function createQuizQuestionGenerationSchema(numOfOptions: number) {
+    return quizQuestionBaseSchema.extend({
         options: z.array(z.string()).length(numOfOptions).describe(`Exactly ${numOfOptions} answer choices for this question`),
         correctAnswer: z.number().int().min(0).max(numOfOptions - 1).describe('The 0-based index of the single correct option'),
         topics: topicsSchema,
     });
 }
 
-type QuizQuestionFields = z.infer<ReturnType<typeof createQuizQuestionSchema>>;
-export type QuizQuestion = QuizQuestionFields & { id: string };
+export type QuizQuestion = z.infer<typeof quizQuestionBaseSchema> & {
+    id: string;
+    topics?: string[];
+};
 export type Quiz = Artifact<QuizQuestion[]>;
 
 export async function createQuiz(options: CreateQuizOptions): Promise<Quiz> {
@@ -43,7 +50,7 @@ export async function createQuiz(options: CreateQuizOptions): Promise<Quiz> {
     } = result.data;
     const resolvedContent = await resolveContent(content);
 
-    const quizQuestionSchema = createQuizQuestionSchema(numOfOptions);
+    const quizQuestionSchema = createQuizQuestionGenerationSchema(numOfOptions);
     const extras: string[] = [];
     const personalization = personalizationBlock(learnerContext);
     if (personalization) {

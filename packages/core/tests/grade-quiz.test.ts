@@ -4,6 +4,7 @@ import { InvalidInputError } from "../src/errors/errors";
 
 const questions = [
     {
+        id: "q-1",
         question: "What is voltage?",
         options: [
             "Electrical potential difference",
@@ -14,6 +15,7 @@ const questions = [
         correctAnswer: 0,
     },
     {
+        id: "q-2",
         question: "What is the unit of current?",
         options: ["Volt", "Ampere", "Ohm", "Watt"],
         correctAnswer: 1,

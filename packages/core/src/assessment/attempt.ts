@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { InvalidInputError } from "../errors/errors.js";
-import { gradeQuiz, gradeQuizOptionsSchema, type GradeQuizQuestion, type GradeQuizResult } from "../quizzes/gradeQuiz.js";
+import { gradeQuiz, gradeQuizOptionsSchema, type GradeQuizResult } from "../quizzes/gradeQuiz.js";
+import type { QuizQuestion } from "../quizzes/create-quiz.js";
 
 export type AssessmentResult = GradeQuizResult;
 
@@ -29,7 +30,7 @@ const completeQuizAttemptOptionsSchema = z.object({
 
 export type CompleteQuizAttemptOptions = {
     attempt: QuizAttempt;
-    questions: GradeQuizQuestion[];
+    questions: QuizQuestion[];
     answers: (number | null)[];
 };
 

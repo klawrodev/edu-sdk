@@ -12,14 +12,19 @@ export const createFlashcardsOptionsSchema = generationOptionsSchema.extend({
     count: z.number().int().positive()
 });
 
-const flashcardSchema = z.object({
+const flashcardBaseSchema = z.object({
     front: z.string().min(1).describe('A clear prompt or cue for the front of the flashcard'),
     back: z.string().min(1).describe('An accurate, study-ready answer for the back of the flashcard'),
+});
+
+const flashcardGenerationSchema = flashcardBaseSchema.extend({
     topics: topicsSchema,
 });
 
-type FlashcardFields = z.infer<typeof flashcardSchema>;
-export type Flashcard = FlashcardFields & { id: string };
+export type Flashcard = z.infer<typeof flashcardBaseSchema> & {
+    id: string;
+    topics?: string[];
+};
 export type Flashcards = Artifact<Flashcard[]>;
 
 export type CreateFlashcardsOptions = z.infer<typeof createFlashcardsOptionsSchema>;
@@ -60,7 +65,7 @@ export async function createFlashcards(options: CreateFlashcardsOptions): Promis
         }),
         output: Output.object({
             schema: artifactLabelSchema.extend({
-                cards: z.array(flashcardSchema).length(count)
+                cards: z.array(flashcardGenerationSchema).length(count)
             })
         })
    });

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Artifact, GradeQuizQuestion, StudySessionContent } from "edu-sdk";
+import type { Artifact, QuizQuestion, StudySessionContent } from "edu-sdk";
 import { describe, expect, test, vi } from "vitest";
 import { StudySession } from "../src/study-session/study-session";
 
@@ -17,7 +17,7 @@ function artifact<T>(content: T, title = "Artifact"): Artifact<T> {
     };
 }
 
-const quizQuestions: GradeQuizQuestion[] = [
+const quizQuestions: QuizQuestion[] = [
     {
         id: "question-1",
         question: "What is voltage?",

@@ -3,7 +3,7 @@ import { InvalidInputError } from "../errors/errors.js";
 
 const quizQuestionSchema = z
     .object({
-        id: z.string().min(1).optional(),
+        id: z.string().min(1),
         question: z.string().min(1),
         options: z.array(z.string()).min(2),
         correctAnswer: z.number().int().min(0),
@@ -48,7 +48,6 @@ export const gradeQuizOptionsSchema = z
     });
 
 export type GradeQuizOptions = z.infer<typeof gradeQuizOptionsSchema>;
-export type GradeQuizQuestion = z.infer<typeof quizQuestionSchema>;
 
 const gradeQuizResultItemSchema = z.object({
     questionIndex: z.number().int().min(0),
