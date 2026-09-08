@@ -1,0 +1,113 @@
+---
+title: createStudySession
+description: Generate a timed study session plan and matching materials from content.
+---
+
+Builds a timed study agenda from your content for a given `durationMinutes`. The model chooses topic, goals, tips, block sequence, and how much of each learning material to generate. Materials are produced via [`createLearningSet()`](/docs/core/create-learning-set).
+
+## Usage
+
+```ts
+import { createStudySession } from "edu-sdk";
+
+const session = await createStudySession({
+  model: "google/gemini-3.6-flash",
+  content,
+  durationMinutes: 45,
+  difficulty: "medium",
+});
+```
+
+## Options
+
+| Option | Type | Required | Default |
+| --- | --- | --- | --- |
+| `model` | `string \| LanguageModel` | Yes | — |
+| `content` | `string \| FileContent` | Yes | — |
+| `durationMinutes` | `number` (integer, 5–240) | Yes | — |
+| `difficulty` | `"easy" \| "medium" \| "hard"` | No | `"medium"` |
+| `topic` | `string` | No | Derived from content |
+| `goals` | `string[]` | No | Derived from content |
+
+`content` may be a string or [`FileContent`](/docs/core/extract-content) (PDF / text / markdown bytes).
+
+When `topic` or `goals` are provided, they seed the plan; otherwise the model derives them from the content.
+
+## Returns
+
+`Promise<Artifact<StudySessionContent>>`
+
+```ts
+{
+  id: string;
+  title: string;
+  description?: string;
+  metadata: {
+    createdAt: string;
+    model: string;
+    difficulty: "easy" | "medium" | "hard";
+  };
+  content: {
+    topic: string;
+    goals: string[];
+    totalDurationMinutes: number;
+    tips: string[];
+    blocks: StudySessionBlock[];
+    materials: LearningSetContent;
+  };
+}
+```
+
+### Blocks
+
+Each block:
+
+```ts
+{
+  id: string;
+  type:
+    | "read"
+    | "notes"
+    | "studyGuide"
+    | "flashcards"
+    | "quiz"
+    | "practiceProblems"
+    | "break"
+    | "review";
+  title: string;
+  durationMinutes: number;
+  instructions: string;
+  materialKey?:
+    | "quiz"
+    | "flashcards"
+    | "practiceProblems"
+    | "notes"
+    | "studyGuide";
+}
+```
+
+Block durations are normalized to match `durationMinutes` (small gaps of a few minutes are adjusted on the last non-break block).
+
+### Materials
+
+`materials` is a [`LearningSetContent`](/docs/core/create-learning-set) object. The model decides which artifacts to include and in what quantity based on duration, difficulty, and content. If nothing is allocated, `materials` is `{}`.
+
+## Example
+
+```ts
+import { createStudySession } from "edu-sdk";
+
+const session = await createStudySession({
+  model: "google/gemini-3.6-flash",
+  content: chapterText,
+  durationMinutes: 60,
+  topic: "Ohm's law",
+  goals: ["Explain voltage, current, and resistance"],
+  difficulty: "easy",
+});
+
+const { blocks, materials, tips } = session.content;
+const quiz = materials.quiz;
+```
+
+Invalid input throws `InvalidInputError`.

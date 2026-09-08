@@ -28,6 +28,7 @@ Every generator returns an `Artifact<T>` envelope:
 | [`createStudyGuide()`](/docs/core/create-study-guide) | `StudyGuideContent` |
 | [`createPracticeProblems()`](/docs/core/create-practice-problems) | `PracticeProblem[]` (each with `id`) |
 | [`createLearningSet()`](/docs/core/create-learning-set) | Nested artifacts chosen via `include` |
+| [`createStudySession()`](/docs/core/create-study-session) | Timed agenda + `LearningSetContent` materials |
 
 Invalid options throw [`InvalidInputError`](/docs/guides/error-handling). Unsupported or empty files throw `UnsupportedContentError` / `ContentExtractionError`.
 
