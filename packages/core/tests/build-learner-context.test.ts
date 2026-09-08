@@ -105,14 +105,14 @@ describe("buildLearnerContext", () => {
         ]);
     });
 
-    test("falls back to questions when byTopic is missing", () => {
+    test("ignores quiz results that have no byTopic", () => {
         const context = buildLearnerContext({
             quizResults: [
                 {
                     result: {
                         score: 1,
-                        total: 2,
-                        percentage: 50,
+                        total: 1,
+                        percentage: 100,
                         results: [
                             {
                                 questionIndex: 0,
@@ -121,48 +121,14 @@ describe("buildLearnerContext", () => {
                                 isCorrect: true,
                                 isAnswered: true,
                             },
-                            {
-                                questionIndex: 1,
-                                selectedAnswer: 0,
-                                correctAnswer: 1,
-                                isCorrect: false,
-                                isAnswered: true,
-                            },
                         ],
                     },
-                    questions: [
-                        {
-                            question: "What is voltage?",
-                            options: ["A", "B"],
-                            correctAnswer: 0,
-                            topics: ["Voltage"],
-                        },
-                        {
-                            question: "What is current?",
-                            options: ["A", "B"],
-                            correctAnswer: 1,
-                            topics: ["Current"],
-                        },
-                    ],
                     attemptedAt: "2026-03-01T00:00:00.000Z",
                 },
             ],
         });
 
-        expect(context.pastPerformance).toEqual([
-            {
-                topic: "Voltage",
-                correct: 1,
-                total: 1,
-                lastAttemptAt: "2026-03-01T00:00:00.000Z",
-            },
-            {
-                topic: "Current",
-                correct: 0,
-                total: 1,
-                lastAttemptAt: "2026-03-01T00:00:00.000Z",
-            },
-        ]);
+        expect(context.pastPerformance).toBeUndefined();
     });
 
     test("keeps provided examInsights and accepts multiple analyses", () => {
@@ -182,7 +148,7 @@ describe("buildLearnerContext", () => {
             ],
         });
 
-        expect(context.focusAreas).toEqual(["Capacitance", "Inductance"]);
+        expect(context.focusAreas).toEqual(["Inductance", "Capacitance"]);
         expect(context.examInsights).toEqual([
             {
                 sourceLabel: "Quiz 3",
