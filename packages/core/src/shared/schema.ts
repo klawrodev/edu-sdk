@@ -6,7 +6,7 @@ const difficultySchema = z.enum(['easy', 'medium', 'hard']);
 
 export type Difficulty = z.infer<typeof difficultySchema>;
 
-const languageModelSchema = z.custom<LanguageModel>(
+export const languageModelSchema = z.custom<LanguageModel>(
     (value) => typeof value === "object" && value !== null,
     "Model must be a model ID or LanguageModel"
 );
