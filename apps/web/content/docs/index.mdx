@@ -1,18 +1,26 @@
 ---
-title: Docs
+title: Overview
 description: Building blocks for AI-powered learning experiences.
 ---
 
-Edu SDK is two packages that work together:
+Edu SDK is two packages that work together: generate learning materials with `edu-sdk`, then render them with `@edu-sdk/react`.
 
 <Cards>
-  <Card title="edu-sdk" href="/docs/core">
-    Generate learning materials from content with a language model.
+  <Card title="Getting Started" href="/docs/getting-started/installation">
+    Install, run a quick start, and learn shared concepts.
+  </Card>
+  <Card title="Core" href="/docs/core">
+    Generators, workflows, content extraction, and assessment.
   </Card>
   <Card title="@edu-sdk/react" href="/docs/react">
-    Render that data as UI.
+    UI components for quizzes, flashcards, study guides, and practice problems.
+  </Card>
+  <Card title="Guides" href="/docs/guides/error-handling">
+    Models, files, study sessions, and error handling.
   </Card>
 </Cards>
+
+## Generate → UI
 
 | Generation | UI |
 | --- | --- |
@@ -20,16 +28,16 @@ Edu SDK is two packages that work together:
 | [`createQuiz()`](/docs/core/create-quiz) | [`<Quiz />`](/docs/react/quiz) |
 | [`createStudyGuide()`](/docs/core/create-study-guide) | [`<StudyGuide />`](/docs/react/study-guide) |
 | [`createPracticeProblems()`](/docs/core/create-practice-problems) | [`<PracticeProblems />`](/docs/react/practice-problems) |
-| [`createNote()`](/docs/core/create-note) | — |
-
-`createNote()` returns an `Artifact` whose `content` is Markdown. It has no React component.
+| [`createNote()`](/docs/core/create-note) | — (Markdown string) |
 
 ## Also in core
 
-Beyond the create → UI pairs above:
+| API | Role |
+| --- | --- |
+| [`extractContent()`](/docs/core/extract-content) | Extract text from PDF / text / markdown bytes |
+| [`createLearningSet()`](/docs/core/create-learning-set) | Several material types from one call |
+| [`createStudySession()`](/docs/core/create-study-session) | Timed agenda plus matching materials |
+| [`gradeQuiz()`](/docs/core/grade-quiz) | Score submitted quiz answers |
+| [Assessment](/docs/core/assessment) | `createQuizAttempt()` / `completeQuizAttempt()` lifecycle |
 
-- [`createLearningSet()`](/docs/core/create-learning-set) — choose quiz, flashcards, practice problems, notes, and/or study guide in one call
-- [`gradeQuiz()`](/docs/core/grade-quiz) — score submitted quiz answers
-- [Assessment](/docs/core/assessment) — `createQuizAttempt()` / `completeQuizAttempt()` for attempt lifecycle
-
-Start with [Installation](/docs/getting-started/installation), then [Quick Start](/docs/getting-started/quick-start) to generate a quiz and render it.
+Start with [Installation](/docs/getting-started/installation), then [Quick Start](/docs/getting-started/quick-start). For the shared `Artifact` shape and React prop rules, see [Concepts](/docs/getting-started/concepts).

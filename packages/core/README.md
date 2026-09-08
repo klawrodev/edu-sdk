@@ -105,6 +105,7 @@ Supported in v1: `application/pdf` (text-based), `text/plain`, `text/markdown` (
 | `createStudyGuide` | Structured study guide |
 | `createPracticeProblems` | Practice problems with solutions |
 | `createNote` | Markdown notes (no React component) |
+| `createStudySession` | Timed agenda plus matching materials |
 
 Shared options on every create call:
 

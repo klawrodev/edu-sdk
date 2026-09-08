@@ -11,10 +11,11 @@ Install `edu-sdk` when you only need generation:
 pnpm add edu-sdk
 ```
 
-`model` is a string model ID or an AI SDK `LanguageModel` instance.
+`model` is a string model ID or an AI SDK `LanguageModel` instance. Your app must configure an AI SDK provider (and API keys) so generation can run. See [Models & providers](/docs/guides/models-and-providers).
 
 ```ts
 model: "google/gemini-3.6-flash"
+// or: openai("gpt-4.1-mini")
 ```
 
 ## React
@@ -31,4 +32,8 @@ Import the default stylesheet once, typically in your root layout:
 import "@edu-sdk/react/styles.css";
 ```
 
-Then go to [Quick Start](/docs/getting-started/quick-start).
+## Next steps
+
+1. [Quick Start](/docs/getting-started/quick-start) — generate a quiz and render it.
+2. [Concepts](/docs/getting-started/concepts) — `Artifact`, shared options, and React prop shapes.
+3. [Working with files](/docs/guides/working-with-files) — PDF / text / markdown as `content`.

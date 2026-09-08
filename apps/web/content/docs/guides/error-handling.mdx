@@ -19,7 +19,7 @@ try {
   const quiz = await createQuiz({
     model: "google/gemini-3.6-flash",
     content,
-    count: 10
+    count: 10,
   });
 } catch (error) {
   if (error instanceof InvalidInputError) {
@@ -36,13 +36,25 @@ try {
 }
 ```
 
-Examples of invalid input:
+## Invalid input examples
 
 - empty `content`
 - `count` of `0` or a non-integer
 - `difficulty` other than `"easy" | "medium" | "hard"`
 - `numOfOptions` less than `2`
+- duplicate types in `createLearningSet` `include`
 - unsupported file MIME / extension
 - empty or unscannable PDF text
 
-Model, network, and generation failures come from the AI SDK. They are not wrapped in `EduSDKError`.
+### Study sessions
+
+[`createStudySession()`](/docs/core/create-study-session) also throws `InvalidInputError` when:
+
+- `durationMinutes` is outside **5–240**
+- block durations sum to a value more than ±5 minutes from `durationMinutes`
+- a block’s `materialKey` references a material that was not allocated
+- the plan has no blocks
+
+## What the SDK does not wrap
+
+Model, network, rate-limit, and generation failures come from the AI SDK. They are **not** wrapped in `EduSDKError`. See [Models & providers](/docs/guides/models-and-providers).

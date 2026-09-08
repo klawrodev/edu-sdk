@@ -90,6 +90,12 @@ const set = await createLearningSet({
 });
 
 const { quiz, flashcards } = set.content;
+
+// Nested values are full artifacts — pass .content into list UIs
+// <Quiz questions={quiz!.content} />
+// <Flashcards flashcards={flashcards!.content} />
 ```
 
 Invalid input throws `InvalidInputError`.
+
+See [Concepts](/docs/getting-started/concepts) for nested artifact shapes, and [Study session flow](/docs/guides/study-session-flow) when materials come from a session.

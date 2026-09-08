@@ -3,7 +3,9 @@ title: Assessment
 description: Record and complete quiz attempts with createQuizAttempt and completeQuizAttempt.
 ---
 
-Assessment helpers wrap [`gradeQuiz()`](/docs/core/grade-quiz) with attempt lifecycle metadata (`id`, `startedAt`, `completedAt`).
+Assessment helpers wrap [`gradeQuiz()`](/docs/core/grade-quiz) with attempt lifecycle metadata (`id`, `startedAt`, `completedAt`). Use them when your app owns persistence of attempts.
+
+[`<Quiz />`](/docs/react/quiz) grades with `gradeQuiz` internally and does **not** call these helpers — use `onComplete` there if you only need the score, or call `createQuizAttempt` / `completeQuizAttempt` yourself when you need attempt records.
 
 ## createQuizAttempt
 
@@ -78,3 +80,5 @@ const { attempt: completed, result } = completeQuizAttempt({
 ```
 
 Invalid input throws `InvalidInputError`.
+
+See also [`gradeQuiz()`](/docs/core/grade-quiz) for scoring without attempt records.

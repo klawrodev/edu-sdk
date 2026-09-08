@@ -5,31 +5,48 @@ description: Generation APIs in the edu-sdk package.
 
 `edu-sdk` generates learning materials from content. Pass a `model` (string ID or AI SDK `LanguageModel`), `content` (`string` or [`FileContent`](/docs/core/extract-content)), and optional `difficulty` (`easy` | `medium` | `hard`).
 
-Use [`extractContent()`](/docs/core/extract-content) to turn PDF / text / markdown bytes into a string first, or pass a file object directly as `content` on any `create*` call.
+Every generator returns an [`Artifact<T>`](/docs/getting-started/concepts) envelope. Invalid options throw [`InvalidInputError`](/docs/guides/error-handling). Unsupported or empty files throw `UnsupportedContentError` / `ContentExtractionError`.
 
-Every generator returns an `Artifact<T>` envelope:
+## When to use which
 
-```ts
-{
-  id: string;
-  title: string;
-  description?: string;
-  metadata: { createdAt: string; model: string; difficulty: Difficulty };
-  content: T;
-}
-```
+| Goal | API |
+| --- | --- |
+| One material type | A single generator below |
+| Several materials from the same content | [`createLearningSet()`](/docs/core/create-learning-set) |
+| Timed agenda plus materials | [`createStudySession()`](/docs/core/create-study-session) |
+| Text from a file first | [`extractContent()`](/docs/core/extract-content) |
+| Score quiz answers | [`gradeQuiz()`](/docs/core/grade-quiz) / [Assessment](/docs/core/assessment) |
+
+## Content
+
+| Function | Returns |
+| --- | --- |
+| [`extractContent()`](/docs/core/extract-content) | Extracted text from file bytes (not an artifact) |
+
+Pass a file object directly as `content` on any `create*` call, or extract first to inspect / cache / trim. See [Working with files](/docs/guides/working-with-files).
+
+## Generators
 
 | Function | `content` type |
 | --- | --- |
-| [`extractContent()`](/docs/core/extract-content) | Returns extracted text from file bytes (not an artifact) |
 | [`createFlashcards()`](/docs/core/create-flashcards) | `Flashcard[]` (each with `id`) |
 | [`createNote()`](/docs/core/create-note) | Markdown `string` |
 | [`createQuiz()`](/docs/core/create-quiz) | `QuizQuestion[]` (each with `id`) |
 | [`createStudyGuide()`](/docs/core/create-study-guide) | `StudyGuideContent` |
 | [`createPracticeProblems()`](/docs/core/create-practice-problems) | `PracticeProblem[]` (each with `id`) |
+
+## Workflows
+
+| Function | `content` type |
+| --- | --- |
 | [`createLearningSet()`](/docs/core/create-learning-set) | Nested artifacts chosen via `include` |
 | [`createStudySession()`](/docs/core/create-study-session) | Timed agenda + `LearningSetContent` materials |
 
-Invalid options throw [`InvalidInputError`](/docs/guides/error-handling). Unsupported or empty files throw `UnsupportedContentError` / `ContentExtractionError`.
+## Assessment
 
-See [Quick Start](/docs/getting-started/quick-start) for a full `createQuiz` example.
+| Function | Role |
+| --- | --- |
+| [`gradeQuiz()`](/docs/core/grade-quiz) | Deterministic scoring (no model call) |
+| [Assessment](/docs/core/assessment) | `createQuizAttempt()` / `completeQuizAttempt()` for attempt lifecycle |
+
+See [Quick Start](/docs/getting-started/quick-start) for a full `createQuiz` example, and [Concepts](/docs/getting-started/concepts) for the shared contract.

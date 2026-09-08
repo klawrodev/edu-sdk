@@ -1,4 +1,10 @@
 {
   "title": "Guides",
-  "pages": ["error-handling"]
+  "pages": [
+    "error-handling",
+    "models-and-providers",
+    "working-with-files",
+    "study-session-flow"
+  ],
+  "defaultOpen": true
 }

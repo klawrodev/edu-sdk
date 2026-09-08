@@ -1,17 +1,21 @@
 {
   "title": "Core",
+  "pagesIndex": "index",
   "pages": [
-    "index",
+    "---Content---",
     "extract-content",
+    "---Generators---",
     "create-flashcards",
     "create-note",
     "create-quiz",
+    "create-study-guide",
+    "create-practice-problems",
+    "---Workflows---",
     "create-learning-set",
     "create-study-session",
+    "---Assessment---",
     "grade-quiz",
-    "assessment",
-    "create-study-guide",
-    "create-practice-problems"
+    "assessment"
   ],
   "defaultOpen": true
 }

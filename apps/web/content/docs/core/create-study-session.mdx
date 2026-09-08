@@ -3,7 +3,9 @@ title: createStudySession
 description: Generate a timed study session plan and matching materials from content.
 ---
 
-Builds a timed study agenda from your content for a given `durationMinutes`. The model chooses topic, goals, tips, block sequence, and how much of each learning material to generate. Materials are produced via [`createLearningSet()`](/docs/core/create-learning-set).
+Builds a timed study agenda from your content for a given `durationMinutes`.
+
+**Two phases:** (1) the model plans topic, goals, tips, block sequence, and a material allocation; (2) materials are generated via [`createLearningSet()`](/docs/core/create-learning-set) from that allocation. There is no React session runner — compose UI from `blocks` and `materials` (see [Study session flow](/docs/guides/study-session-flow)).
 
 ## Usage
 
@@ -86,11 +88,13 @@ Each block:
 }
 ```
 
-Block durations are normalized to match `durationMinutes` (small gaps of a few minutes are adjusted on the last non-break block).
+Block durations are normalized to match `durationMinutes`. Gaps within ±5 minutes are adjusted on the last non-break block; larger mismatches throw `InvalidInputError`.
+
+`materialKey` must only reference a material type that was allocated. The SDK validates that before generating materials.
 
 ### Materials
 
-`materials` is a [`LearningSetContent`](/docs/core/create-learning-set) object. The model decides which artifacts to include and in what quantity based on duration, difficulty, and content. If nothing is allocated, `materials` is `{}`.
+`materials` is a [`LearningSetContent`](/docs/core/create-learning-set) object (nested full artifacts). The model decides which types to include and in what quantity based on duration, difficulty, and content. If nothing is allocated, `materials` is `{}`.
 
 ## Example
 
@@ -107,7 +111,10 @@ const session = await createStudySession({
 });
 
 const { blocks, materials, tips } = session.content;
-const quiz = materials.quiz;
+const quiz = materials.quiz; // Artifact<QuizQuestion[]> | undefined
+// <Quiz questions={quiz!.content} />
 ```
 
-Invalid input throws `InvalidInputError`.
+Invalid input throws `InvalidInputError` (for example `durationMinutes` outside 5–240, empty content, or plan/allocation mismatches).
+
+Next: [Study session flow](/docs/guides/study-session-flow) for wiring blocks to React components.

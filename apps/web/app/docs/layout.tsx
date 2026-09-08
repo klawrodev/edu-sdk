@@ -4,7 +4,12 @@ import { baseOptions } from '@/lib/layout.shared';
 
 export default function Layout({ children }: LayoutProps<'/docs'>) {
   return (
-    <DocsLayout tree={source.getPageTree()} {...baseOptions()}>
+    <DocsLayout
+      {...baseOptions()}
+      tree={source.getPageTree()}
+      // Sidebar already has Getting Started / Core / React — don't repeat top-nav links here
+      links={[]}
+    >
       {children}
     </DocsLayout>
   );
