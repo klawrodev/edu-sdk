@@ -44,11 +44,15 @@ export function QuizDemo() {
 }
 ```
 
+`Quiz` takes `QuizQuestion[]` — each question needs a required `id` (generators stamp this). `onComplete` receives `GradeQuizResult`, which may include `byTopic` when questions have `topics`. The component does not render topics or `byTopic` yet — read them from `onComplete` if you need them.
+
+Pass optional `learnerContext` at generation time in `edu-sdk` (see the [edu-sdk README](../core/README.md) personalization section).
+
 ## Components
 
 | Component | Props | Source |
 | --- | --- | --- |
-| `Quiz` | `questions`, `onComplete?` | `createQuiz` / `gradeQuiz` |
+| `Quiz` | `questions` (`QuizQuestion[]`), `onComplete?` | `createQuiz` / `gradeQuiz` |
 | `Flashcards` | `flashcards` | `createFlashcards` |
 | `StudyGuide` | `studyGuide` | `createStudyGuide` |
 | `PracticeProblems` | `problems` | `createPracticeProblems` |

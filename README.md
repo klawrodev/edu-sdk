@@ -6,7 +6,7 @@
 
 **Turn any content into learning materials.**
 
-The TypeScript SDK for AI-powered learning. Generate quizzes, flashcards, study guides, practice problems, notes, learning sets, and study sessions from content — then render the paired materials with React where a component exists.
+The TypeScript SDK for AI-powered learning. Generate quizzes, flashcards, study guides, practice problems, notes, learning sets, and study sessions from content — then render the paired materials with React where a component exists. Optional `learnerContext` personalizes generation from past work and quiz history while the SDK stays stateless.
 
 ## Packages
 
