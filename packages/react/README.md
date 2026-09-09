@@ -56,9 +56,9 @@ Pass optional `learnerContext` at generation time in `edu-sdk` (see the [edu-sdk
 | `Flashcards` | `flashcards` | `createFlashcards` |
 | `StudyGuide` | `studyGuide` | `createStudyGuide` |
 | `PracticeProblems` | `problems` | `createPracticeProblems` |
-| `StudySession` | `session`, `allowSkip?`, `autoAdvance?`, `renderNotes?`, `onBlockComplete?`, `onSessionComplete?` | `createStudySession` |
+| `StudySession` | `session`, material `render*` / `*Props`, `allowSkip?`, `autoAdvance?`, `onBlockComplete?`, `onSessionComplete?` | `createStudySession` |
 
-There is no React component for `createNote` (Markdown only) or `createLearningSet`. Compose the material components from nested artifacts, or use `StudySession` / a custom runner for session agendas — see the docs site Guides.
+There is no React component for `createNote` (Markdown only) or `createLearningSet`. Compose the material components from nested artifacts, or use `StudySession` / a custom runner for session agendas — see the docs site Guides. `StudySession` can pass props through to nested materials (`quizProps`, …) or replace them (`renderQuiz`, …).
 
 ### Examples
 

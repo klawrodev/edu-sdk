@@ -44,6 +44,14 @@ type StudySessionProps = {
   allowSkip?: boolean; // default true
   autoAdvance?: boolean; // default false
   renderNotes?: (markdown: string) => ReactNode;
+  renderQuiz?: (questions: QuizQuestion[]) => ReactNode;
+  renderFlashcards?: (flashcards: Flashcard[]) => ReactNode;
+  renderPracticeProblems?: (problems: PracticeProblem[]) => ReactNode;
+  renderStudyGuide?: (studyGuide: Artifact<StudyGuideContent>) => ReactNode;
+  quizProps?: Omit<QuizProps, "questions">;
+  flashcardsProps?: Omit<FlashcardsProps, "flashcards">;
+  practiceProblemsProps?: Omit<PracticeProblemsProps, "problems">;
+  studyGuideProps?: Omit<StudyGuideProps, "studyGuide">;
   onBlockComplete?: (block: StudySessionBlock, index: number) => void;
   onSessionComplete?: () => void;
 };
@@ -52,10 +60,38 @@ type StudySessionProps = {
 - **`allowSkip`** — when `true` (default), a Skip control advances without waiting for the timer.
 - **`autoAdvance`** — when `true`, moving to the next block (or finishing) happens when the block timer hits zero. Default is `false`.
 - **`renderNotes`** — optional Markdown renderer for `materials.notes`. Without it, notes render as plain preformatted text.
+- **`renderQuiz` / `renderFlashcards` / `renderPracticeProblems` / `renderStudyGuide`** — replace the default nested material UI for that type. When set, the matching `*Props` are ignored.
+- **`quizProps` / `flashcardsProps` / `practiceProblemsProps` / `studyGuideProps`** — passed through to the default nested component (excluding the data prop, which StudySession supplies). Use for styling or callbacks like `onComplete` without replacing the UI.
 - **`onBlockComplete`** — fires once per block when the learner leaves it (Next / Skip / Finish) or when the timer expires.
 - **`onSessionComplete`** — fires once when the last block is finished (or auto-advanced through).
 
 Empty `blocks` renders nothing.
+
+## Customizing nested materials
+
+Style or wire the default quiz without replacing it:
+
+```tsx
+<StudySession
+  session={session.content}
+  quizProps={{
+    className: "my-session-quiz",
+    onComplete: (result) => {
+      // Persist GradeQuizResult (may include byTopic)
+    },
+  }}
+/>
+```
+
+Or swap in your own UI:
+
+```tsx
+<StudySession
+  session={session.content}
+  renderQuiz={(questions) => <MyQuiz questions={questions} />}
+  renderFlashcards={(cards) => <MyCards cards={cards} />}
+/>
+```
 
 ## classNames
 
@@ -98,4 +134,4 @@ Empty `blocks` renders nothing.
 />
 ```
 
-For a custom runner instead of this component, see [Study session flow](/docs/guides/study-session-flow). See [Styling](/docs/react/styling) for `styles.css` and CSS variables.
+For a fully custom runner (own timers / navigation), see [Study session flow](/docs/guides/study-session-flow). See [Styling](/docs/react/styling) for `styles.css` and CSS variables.

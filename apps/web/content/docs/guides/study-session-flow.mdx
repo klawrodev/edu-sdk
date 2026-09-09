@@ -34,11 +34,11 @@ import "@edu-sdk/react/styles.css";
 <StudySession session={session.content} />
 ```
 
-The component owns block progress, a per-block countdown, Skip / Next / Finish, and mounts the matching material components. See [`<StudySession />`](/docs/react/study-session) for props (`allowSkip`, `autoAdvance`, `renderNotes`, callbacks).
+The component owns block progress, a per-block countdown, Skip / Next / Finish, and mounts the matching material components. Customize nested materials with `renderQuiz` / `quizProps` (and the same pattern for flashcards, practice problems, study guide, and `renderNotes`) — see [`<StudySession />`](/docs/react/study-session). You do **not** need a fully custom runner just to style a nested quiz or attach `onComplete`.
 
 ## Custom runner
 
-If you need different UX, walk `blocks` yourself and compose materials:
+If you need different session UX (custom timers, forced revisit rules, etc.), walk `blocks` yourself and compose materials:
 
 ```ts
 for (const block of blocks) {
@@ -97,6 +97,7 @@ Remember: list UIs take `.content`; [`StudyGuide`](/docs/react/study-guide) take
 
 - Persistence of session state (even with `<StudySession />`, use the callbacks)
 - A Markdown renderer for notes if you want more than plain text (`renderNotes` or your own UI)
-- Any UX beyond the default runner (custom timers, forced revisit rules, etc.)
+- Nested material styling/callbacks via `*Props`, or full replacement via `render*` on `<StudySession />`
+- Any UX beyond the default runner (custom timers, forced revisit rules, etc.) when you build your own
 
 See also [Concepts](/docs/getting-started/concepts) and [`createStudySession`](/docs/core/create-study-session).
