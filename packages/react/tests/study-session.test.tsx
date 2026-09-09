@@ -181,4 +181,129 @@ describe("StudySession", () => {
 
         expect(container).toBeEmptyDOMElement();
     });
+
+    test("passes quizProps through to the default Quiz", async () => {
+        const user = userEvent.setup();
+        const { container } = render(
+            <StudySession
+                session={makeSession()}
+                quizProps={{ className: "custom-quiz" }}
+            />
+        );
+
+        await user.click(screen.getByRole("button", { name: "Skip" }));
+        await user.click(screen.getByRole("button", { name: "Skip" }));
+
+        expect(container.querySelector(".custom-quiz")).toBeInTheDocument();
+        expect(screen.getByText("What is voltage?")).toBeInTheDocument();
+    });
+
+    test("uses renderQuiz instead of the default Quiz", async () => {
+        const user = userEvent.setup();
+        render(
+            <StudySession
+                session={makeSession()}
+                renderQuiz={(questions) => (
+                    <div data-testid="custom-quiz">
+                        Custom quiz with {questions.length} question(s)
+                    </div>
+                )}
+            />
+        );
+
+        await user.click(screen.getByRole("button", { name: "Skip" }));
+        await user.click(screen.getByRole("button", { name: "Skip" }));
+
+        expect(screen.getByTestId("custom-quiz")).toHaveTextContent(
+            "Custom quiz with 1 question(s)"
+        );
+        expect(screen.queryByText("What is voltage?")).not.toBeInTheDocument();
+        expect(screen.queryByText("1 / 1")).not.toBeInTheDocument();
+    });
+
+    test("renderQuiz wins over quizProps", async () => {
+        const user = userEvent.setup();
+        const { container } = render(
+            <StudySession
+                session={makeSession()}
+                quizProps={{ className: "default-quiz-props" }}
+                renderQuiz={() => <div data-testid="override-quiz">Override</div>}
+            />
+        );
+
+        await user.click(screen.getByRole("button", { name: "Skip" }));
+        await user.click(screen.getByRole("button", { name: "Skip" }));
+
+        expect(screen.getByTestId("override-quiz")).toBeInTheDocument();
+        expect(container.querySelector(".default-quiz-props")).not.toBeInTheDocument();
+        expect(container.querySelector(".edu-quiz")).not.toBeInTheDocument();
+    });
+
+    test("passes flashcardsProps through to the default Flashcards", () => {
+        const flashcards = [
+            { id: "card-1", front: "Voltage", back: "Potential difference" },
+        ];
+        const session = makeSession({
+            blocks: [
+                {
+                    id: "cards",
+                    type: "flashcards",
+                    title: "Card warm-up",
+                    durationMinutes: 5,
+                    instructions: "Flip cards.",
+                    materialKey: "flashcards",
+                },
+            ],
+            materials: {
+                flashcards: artifact(flashcards, "Voltage cards"),
+            },
+        });
+
+        const { container } = render(
+            <StudySession
+                session={session}
+                flashcardsProps={{ className: "custom-flashcards" }}
+            />
+        );
+
+        expect(container.querySelector(".custom-flashcards")).toBeInTheDocument();
+        expect(screen.getByText("Voltage")).toBeInTheDocument();
+    });
+
+    test("uses renderFlashcards instead of the default Flashcards", () => {
+        const flashcards = [
+            { id: "card-1", front: "Voltage", back: "Potential difference" },
+        ];
+        const session = makeSession({
+            blocks: [
+                {
+                    id: "cards",
+                    type: "flashcards",
+                    title: "Card warm-up",
+                    durationMinutes: 5,
+                    instructions: "Flip cards.",
+                    materialKey: "flashcards",
+                },
+            ],
+            materials: {
+                flashcards: artifact(flashcards, "Voltage cards"),
+            },
+        });
+
+        render(
+            <StudySession
+                session={session}
+                renderFlashcards={(cards) => (
+                    <div data-testid="custom-flashcards">
+                        Custom deck ({cards.length})
+                    </div>
+                )}
+            />
+        );
+
+        expect(screen.getByTestId("custom-flashcards")).toHaveTextContent(
+            "Custom deck (1)"
+        );
+        expect(screen.queryByText("Voltage")).not.toBeInTheDocument();
+    });
 });
