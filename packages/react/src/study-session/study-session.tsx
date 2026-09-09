@@ -1,11 +1,14 @@
 'use client'
 
-import type { StudySessionBlock, StudySessionContent } from "edu-sdk";
+import type {
+    Artifact, Flashcard, PracticeProblem, QuizQuestion, StudyGuideContent,
+    StudySessionBlock, StudySessionContent
+} from "edu-sdk";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Flashcards } from "../flashcards/flashcards.js";
-import { PracticeProblems } from "../practice-problems/practice-problem.js";
-import { Quiz } from "../quiz/quiz.js";
-import { StudyGuide } from "../studyguide/studyguide.js";
+import { Flashcards, type FlashcardsProps } from "../flashcards/flashcards.js";
+import { PracticeProblems, type PracticeProblemsProps } from "../practice-problems/practice-problem.js";
+import { Quiz, type QuizProps } from "../quiz/quiz.js";
+import { StudyGuide, type StudyGuideProps } from "../studyguide/studyguide.js";
 import { cn } from "../utils/index.js";
 
 export type StudySessionClassNames = {
@@ -36,6 +39,14 @@ export type StudySessionProps = {
     allowSkip?: boolean;
     autoAdvance?: boolean;
     renderNotes?: (markdown: string) => ReactNode;
+    renderQuiz?: (questions: QuizQuestion[]) => ReactNode;
+    renderFlashcards?: (flashcards: Flashcard[]) => ReactNode;
+    renderPracticeProblems?: (problems: PracticeProblem[]) => ReactNode;
+    renderStudyGuide?: (studyGuide: Artifact<StudyGuideContent>) => ReactNode;
+    quizProps?: Omit<QuizProps, "questions">;
+    flashcardsProps?: Omit<FlashcardsProps, "flashcards">;
+    practiceProblemsProps?: Omit<PracticeProblemsProps, "problems">;
+    studyGuideProps?: Omit<StudyGuideProps, "studyGuide">;
     onBlockComplete?: (block: StudySessionBlock, index: number) => void;
     onSessionComplete?: () => void;
 };
@@ -54,6 +65,14 @@ export function StudySession({
     allowSkip = true,
     autoAdvance = false,
     renderNotes,
+    renderQuiz,
+    renderFlashcards,
+    renderPracticeProblems,
+    renderStudyGuide,
+    quizProps,
+    flashcardsProps,
+    practiceProblemsProps,
+    studyGuideProps,
     onBlockComplete,
     onSessionComplete,
 }: StudySessionProps) {
@@ -143,22 +162,38 @@ export function StudySession({
 
     function renderMaterial(): ReactNode {
         switch (currentBlock.materialKey) {
-            case "quiz":
-                return materials.quiz ? (
-                    <Quiz questions={materials.quiz.content} />
-                ) : null;
-            case "flashcards":
-                return materials.flashcards ? (
-                    <Flashcards flashcards={materials.flashcards.content} />
-                ) : null;
-            case "practiceProblems":
-                return materials.practiceProblems ? (
-                    <PracticeProblems problems={materials.practiceProblems.content} />
-                ) : null;
-            case "studyGuide":
-                return materials.studyGuide ? (
-                    <StudyGuide studyGuide={materials.studyGuide} />
-                ) : null;
+            case "quiz": {
+                if (!materials.quiz) return null;
+                if (renderQuiz) return renderQuiz(materials.quiz.content);
+                return <Quiz questions={materials.quiz.content} {...quizProps} />;
+            }
+            case "flashcards": {
+                if (!materials.flashcards) return null;
+                if (renderFlashcards) return renderFlashcards(materials.flashcards.content);
+                return (
+                    <Flashcards
+                        flashcards={materials.flashcards.content}
+                        {...flashcardsProps}
+                    />
+                );
+            }
+            case "practiceProblems": {
+                if (!materials.practiceProblems) return null;
+                if (renderPracticeProblems) return renderPracticeProblems(materials.practiceProblems.content);
+                return (
+                    <PracticeProblems
+                        problems={materials.practiceProblems.content}
+                        {...practiceProblemsProps}
+                    />
+                );
+            }
+            case "studyGuide": {
+                if (!materials.studyGuide) return null;
+                if (renderStudyGuide) return renderStudyGuide(materials.studyGuide);
+                return (
+                    <StudyGuide studyGuide={materials.studyGuide} {...studyGuideProps} />
+                );
+            }
             case "notes":
                 return materials.notes ? (
                     <div className={cn("edu-study-session__notes", classNames?.notes)}>
